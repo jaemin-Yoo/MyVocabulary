@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("click", "Add");
                 Intent intent = new Intent(MainActivity.this, BookActivity.class);
                 startActivity(intent);
             }
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("click", "Test");
                 Intent intent = new Intent(MainActivity.this, BookActivity.class);
                 startActivity(intent);
             }
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("click", "Exit");
                 finish();
             }
         });
