@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,7 +33,10 @@ public class BookActivity extends AppCompatActivity {
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";
     private String add_text;
-    private Context mContext;
+    private String modify_text;
+    private String select_text;
+    private ListView listView;
+    private Booklist bl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +55,10 @@ public class BookActivity extends AppCompatActivity {
             }
         });
 
-        ListView listView = findViewById(R.id.listview);
+        listView = findViewById(R.id.listview);
         BookAdapter adapter = new BookAdapter();
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                show();
-                return false;
-            }
-        });
+        registerForContextMenu(listView);
 
         add=findViewById(R.id.add_book);
         add.setOnClickListener(new View.OnClickListener() {
@@ -118,59 +117,72 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    /*
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        MenuItem Edit = menu.add(Menu.NONE, 1001, 1, "수정");
-        MenuItem Delete = menu.add(Menu.NONE, 1002, 2, "삭제");
-        Edit.setOnMenuItemClickListener(onEditMenu);
-        Edit.setOnMenuItemClickListener(onDeleteMenu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        bl = (Booklist) listView.getAdapter().getItem(info.position);
+
+        new MenuInflater(this).inflate(R.menu.context_menu, menu);
+        menu.setHeaderTitle(bl.getName());
     }
 
-    private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            switch (menuItem.getItemId()){
-                case 1001:
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        select_text = bl.getName();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                    View view = LayoutInflater.from(mContext)
-                            .inflate(R.layout.activity_booklist, null, false);
-                    builder.setView(view);
-            }
-        }
-    }
+        switch(item.getItemId())
+        {
+            case R.id.modify:
+                AlertDialog.Builder md = new AlertDialog.Builder(BookActivity.this);
 
-     */
+                md.setTitle("단어장 수정");       // 제목 설정
+                md.setMessage("수정 할 단어장 이름을 입력하세요.");   // 내용 설정
+                md.setIcon(R.drawable.book);
 
-    void show(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
-        builder.setMessage("어떤 작업을 수행하시겠습니까?");
-        builder.setPositiveButton("삭제",
-                new DialogInterface.OnClickListener() {
+                // EditText 삽입하기
+                final EditText et_name = new EditText(BookActivity.this);
+                et_name.setText(select_text);
+                md.setView(et_name);
+
+
+                // 확인 버튼 설정
+                md.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
-                    }
-                });
-        builder.setNegativeButton("수정",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        // Text 값 받아서 로그 남기기
+                        modify_text = et_name.getText().toString();
+                        bookDB.execSQL("UPDATE "+tablename+" SET"+" name='"+modify_text+"' WHERE name='"+select_text+"';");
+                        updateListView();
+                        dialog.dismiss();     //닫기
                         Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
+                        // Event
                     }
                 });
-        builder.setNeutralButton("취소",
-                new DialogInterface.OnClickListener() {
+
+                // 취소 버튼 설정
+                md.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();     //닫기
+                        // Event
                     }
                 });
-        builder.show();
+
+                md.show();
+                return true;
+
+            case R.id.delete:
+                bookDB.execSQL("DELETE FROM "+tablename+" WHERE name='"+select_text+"';");
+                updateListView();
+                Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
+                return true;
+        }
+
+        return super.onContextItemSelected(item);
     }
 
     public void updateListView(){
