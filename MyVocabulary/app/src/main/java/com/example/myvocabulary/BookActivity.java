@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -28,13 +29,17 @@ import java.util.ArrayList;
 
 public class BookActivity extends AppCompatActivity {
 
+    public String TAG = "MyVocabulary";
     private ImageButton back, add;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";
-    private String add_text;
-    private String modify_text;
-    private String select_text;
+    private String add_name;
+    private String add_subname;
+    private String modify_name;
+    private String modify_subname;
+    private String select_name;
+    private String select_subname;
     private ListView listView;
     private Booklist bl;
 
@@ -64,16 +69,28 @@ public class BookActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+
+                final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
+                final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
+
                 AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
 
                 ad.setTitle("단어장 추가");       // 제목 설정
                 ad.setMessage("단어장 이름");   // 내용 설정
                 ad.setIcon(R.drawable.book);
 
+                ad.setView(et);
+
+                /*
                 // EditText 삽입하기
                 final EditText et_name = new EditText(BookActivity.this);
                 ad.setView(et_name);
 
+
+                 */
 
                 // 확인 버튼 설정
                 ad.setPositiveButton("Add", new DialogInterface.OnClickListener() {
@@ -81,8 +98,9 @@ public class BookActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         // Text 값 받아서 로그 남기기
-                        add_text = et_name.getText().toString();
-                        bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_text+"','test');");
+                        add_name = et_name.getText().toString();
+                        add_subname = et_subname.getText().toString();
+                        bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
                         updateListView();
                         dialog.dismiss();     //닫기
                         // Event
@@ -125,17 +143,24 @@ public class BookActivity extends AppCompatActivity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         bl = (Booklist) listView.getAdapter().getItem(info.position);
 
-        new MenuInflater(this).inflate(R.menu.context_menu, menu);
         menu.setHeaderTitle(bl.getName());
     }
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        select_text = bl.getName();
+        select_name = bl.getName();
+        select_subname = bl.getSubname();
 
         switch(item.getItemId())
         {
             case R.id.modify:
+
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+
+                final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
+                final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
+
                 AlertDialog.Builder md = new AlertDialog.Builder(BookActivity.this);
 
                 md.setTitle("단어장 수정");       // 제목 설정
@@ -143,9 +168,10 @@ public class BookActivity extends AppCompatActivity {
                 md.setIcon(R.drawable.book);
 
                 // EditText 삽입하기
-                final EditText et_name = new EditText(BookActivity.this);
-                et_name.setText(select_text);
-                md.setView(et_name);
+
+                md.setView(et);
+                et_name.setText(select_name);
+                et_subname.setText(select_subname);
 
 
                 // 확인 버튼 설정
@@ -154,8 +180,9 @@ public class BookActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         // Text 값 받아서 로그 남기기
-                        modify_text = et_name.getText().toString();
-                        bookDB.execSQL("UPDATE "+tablename+" SET"+" name='"+modify_text+"' WHERE name='"+select_text+"';");
+                        modify_name = et_name.getText().toString();
+                        modify_subname = et_subname.getText().toString();
+                        bookDB.execSQL("UPDATE "+tablename+" SET"+" name='"+modify_name+"', subname='"+modify_subname+"' WHERE name='"+select_name+"';");
                         updateListView();
                         dialog.dismiss();     //닫기
                         Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
@@ -176,9 +203,34 @@ public class BookActivity extends AppCompatActivity {
                 return true;
 
             case R.id.delete:
-                bookDB.execSQL("DELETE FROM "+tablename+" WHERE name='"+select_text+"';");
-                updateListView();
-                Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder dl = new AlertDialog.Builder(BookActivity.this);
+
+                dl.setTitle("단어장 삭제");       // 제목 설정
+                dl.setMessage("정말 삭제하시겠습니까?");   // 내용 설정
+                dl.setIcon(R.drawable.book);
+
+                // 확인 버튼 설정
+                dl.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        bookDB.execSQL("DELETE FROM "+tablename+" WHERE name='"+select_name+"';");
+                        updateListView();
+                        dialog.dismiss();     //닫기
+                        Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
+                        // Event
+                    }
+                });
+
+                // 취소 버튼 설정
+                dl.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();     //닫기
+                        // Event
+                    }
+                });
+
+                dl.show();
                 return true;
         }
 
@@ -192,7 +244,7 @@ public class BookActivity extends AppCompatActivity {
         SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         Cursor c = ReadDB.rawQuery("SELECT * FROM "+tablename, null);
 
-        if(c!=null){
+        if(c!=null && c.getCount() != 0){
             if(c.moveToFirst()){
                 do{
                     String Name = c.getString(c.getColumnIndex("name"));
@@ -201,6 +253,9 @@ public class BookActivity extends AppCompatActivity {
                     listView.setAdapter(adapter);
                 } while (c.moveToNext());
             }
+        }
+        else{
+            listView.setAdapter(null); // 저장된 데이터가 없을 때, 공백으로 listview 업데이트
         }
     }
 
