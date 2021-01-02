@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.bumptech.glide.Glide;
+
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton add, test, exit;
@@ -19,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         add=findViewById(R.id.btn_add);
+        Glide.with(this).load(R.drawable.btn_add).into(add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         test=findViewById(R.id.btn_test);
+        Glide.with(this).load(R.drawable.btn_test).into(test);
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         exit=findViewById(R.id.btn_exit);
+        Glide.with(this).load(R.drawable.btn_exit).into(exit);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -2,6 +2,7 @@ package com.example.myvocabulary;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -25,12 +27,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class BookActivity extends AppCompatActivity {
 
     public String TAG = "MyVocabulary";
-    private ImageButton back, add;
+    private ImageButton back, add, home;
+    private ImageView img_book;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";
@@ -42,17 +47,19 @@ public class BookActivity extends AppCompatActivity {
     private String select_subname;
     private ListView listView;
     private Booklist bl;
+    public static String bk_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book);
+        setContentView(R.layout.activity_booklist);
 
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         bookDB.execSQL("CREATE TABLE IF NOT EXISTS "+tablename
                 +" (name VARCHAR(10) PRIMARY KEY, subname VARCHAR(20));");
 
         back=findViewById(R.id.btn_back);
+        Glide.with(this).load(R.drawable.back).into(back); // 이미지 로드
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,12 +67,32 @@ public class BookActivity extends AppCompatActivity {
             }
         });
 
+        home = findViewById(R.id.btn_home);
+        Glide.with(this).load(R.drawable.home).into(home);
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 홈화면으로 돌아가기
+            }
+        });
+
         listView = findViewById(R.id.listview);
         BookAdapter adapter = new BookAdapter();
+        registerForContextMenu(listView); // 리스트뷰 Context menu 등록
 
-        registerForContextMenu(listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(BookActivity.this, WordActivity.class);
+                startActivity(intent);
+                bl = (Booklist) listView.getAdapter().getItem(i);
+                bk_name = (String) bl.getName();
+                Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         add=findViewById(R.id.add_book);
+        Glide.with(this).load(R.drawable.add_book).into(add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,14 +110,6 @@ public class BookActivity extends AppCompatActivity {
                 ad.setIcon(R.drawable.book);
 
                 ad.setView(et);
-
-                /*
-                // EditText 삽입하기
-                final EditText et_name = new EditText(BookActivity.this);
-                ad.setView(et_name);
-
-
-                 */
 
                 // 확인 버튼 설정
                 ad.setPositiveButton("Add", new DialogInterface.OnClickListener() {

@@ -25,7 +25,7 @@ public class BooklistView extends LinearLayout {
 
     private void init(Context context) {
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.activity_booklist, this, true);
+        inflater.inflate(R.layout.list_book, this, true);
 
         textView = findViewById(R.id.name);
         textView2 = findViewById(R.id.subname);
