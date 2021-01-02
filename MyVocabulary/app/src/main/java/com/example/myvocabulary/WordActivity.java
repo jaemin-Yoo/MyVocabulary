@@ -36,11 +36,16 @@ import java.util.ArrayList;
 
 public class WordActivity extends AppCompatActivity {
 
-    public String TAG = "MyVocabulary";
-    private ImageButton back, home, register;
+    public String TAG = "Log";
+    private ImageButton back, home, register, delete;
     private ImageView word, mean;
     private TextView title;
     private String bk_name = BookActivity.bk_name;
+    private ListView listView;
+    private String add_word, add_mean;
+
+    SQLiteDatabase bookDB = null;
+    private final String dbname = "MyVocabulary";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,8 @@ public class WordActivity extends AppCompatActivity {
 
         title = findViewById(R.id.title);
         title.setText(bk_name); // 단어장 이름
+
+        bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
 
         back=findViewById(R.id.btn_back);
         Glide.with(this).load(R.drawable.back).into(back); // 이미지 로드
@@ -81,8 +88,130 @@ public class WordActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 단어 등록
                 // SQLite 접근
+
+                final EditText et_word = (EditText) findViewById(R.id.edit_word);
+                final EditText et_mean = (EditText) findViewById(R.id.edit_mean);
+
+                add_word = et_word.getText().toString();
+                add_mean = et_mean.getText().toString();
+
+                if(add_word.length() != 0 && add_mean.length() != 0){
+                    try{
+                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"');"); // SQLite 단어 추가
+                        updateListView();
+                        et_word.setText(""); // 추가 후 EditText 공백처리
+                        et_mean.setText("");
+                        et_word.requestFocus();
+                        et_word.setCursorVisible(true);
+                        Log.d(TAG, "추가한 단어:"+add_word);
+                    } catch (Exception e){
+                        Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
+                    }
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "빈칸을 채우세요.",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
+
+        listView = findViewById(R.id.word_list);
+        WordAdapter adapter = new WordAdapter();
+
+        SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
+        Cursor c = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
+
+        if(c!=null){
+            if(c.moveToFirst()){
+                do{
+                    String Name = c.getString(c.getColumnIndex("word"));
+                    String Subname = c.getString(c.getColumnIndex("mean"));
+                    adapter.addItem(new Wordlist(Name, Subname, R.drawable.delete));
+                    listView.setAdapter(adapter);
+                } while (c.moveToNext());
+            }
+        }
+    }
+
+
+    public void updateListView(){
+        ListView listView = findViewById(R.id.word_list);
+        WordAdapter adapter = new WordAdapter();
+
+        SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
+        Cursor c = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
+
+        if(c!=null && c.getCount() != 0){
+            if(c.moveToFirst()){
+                do{
+                    String Name = c.getString(c.getColumnIndex("word"));
+                    String Subname = c.getString(c.getColumnIndex("mean"));
+                    adapter.addItem(new Wordlist(Name, Subname, R.drawable.delete));
+                    listView.setAdapter(adapter);
+                } while (c.moveToNext());
+            }
+        }
+        else{
+            listView.setAdapter(null); // 저장된 데이터가 없을 때, 공백으로 listview 업데이트
+        }
+    }
+
+    class WordAdapter extends BaseAdapter {
+
+        ArrayList<Wordlist> items = new ArrayList<Wordlist>();
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        public void addItem(Wordlist item) {
+            items.add(item);
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return items.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            WordlistView wordlistView = null;
+            if(view == null){
+                wordlistView = new WordlistView(getApplicationContext());
+            }
+            else{
+                wordlistView = (WordlistView) view;
+            }
+
+            Wordlist item = items.get(i);
+            wordlistView.setName(item.getName());
+            wordlistView.setSubname(item.getSubname());
+            wordlistView.setWord(item.getResId());
+
+            final String delete_word = item.getName();
+
+            delete = wordlistView.findViewById(R.id.btn_delete);
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG,"삭제한 단어:"+delete_word);
+                    try{
+                        bookDB.execSQL("DELETE FROM "+bk_name+" WHERE word='"+delete_word+"';"); // 단어 삭제
+                        updateListView();
+                        Toast.makeText(getApplicationContext(),"삭제되었습니다.",Toast.LENGTH_SHORT).show();
+                    } catch (Exception e){
+                        Toast.makeText(getApplicationContext(),"문제가 발생하였습니다. 개발자에게 문의하세요.",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+            return wordlistView;
+        }
     }
 }

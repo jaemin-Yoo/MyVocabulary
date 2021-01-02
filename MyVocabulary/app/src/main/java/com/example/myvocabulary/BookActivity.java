@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 public class BookActivity extends AppCompatActivity {
 
-    public String TAG = "MyVocabulary";
+    public String TAG = "Log";
     private ImageButton back, add, home;
     private ImageView img_book;
     SQLiteDatabase bookDB = null;
@@ -76,7 +76,7 @@ public class BookActivity extends AppCompatActivity {
             }
         });
 
-        listView = findViewById(R.id.listview);
+        listView = findViewById(R.id.book_list);
         BookAdapter adapter = new BookAdapter();
         registerForContextMenu(listView); // 리스트뷰 Context menu 등록
 
@@ -119,9 +119,16 @@ public class BookActivity extends AppCompatActivity {
                         // Text 값 받아서 로그 남기기
                         add_name = et_name.getText().toString();
                         add_subname = et_subname.getText().toString();
-                        bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
-                        updateListView();
-                        dialog.dismiss();     //닫기
+                        try{
+                            bookDB.execSQL("CREATE TABLE "+add_name
+                                    +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20));");
+                            bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
+                            updateListView();
+                            dialog.dismiss();     //닫기
+                        } catch (Exception e){
+                            Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                        }
+
                         // Event
                     }
                 });
@@ -201,11 +208,17 @@ public class BookActivity extends AppCompatActivity {
                         // Text 값 받아서 로그 남기기
                         modify_name = et_name.getText().toString();
                         modify_subname = et_subname.getText().toString();
-                        bookDB.execSQL("UPDATE "+tablename+" SET"+" name='"+modify_name+"', subname='"+modify_subname+"' WHERE name='"+select_name+"';");
-                        updateListView();
-                        dialog.dismiss();     //닫기
-                        Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
-                        // Event
+
+                        try{
+                            bookDB.execSQL("ALTER TABLE "+select_name+" RENAME TO "+modify_name+";");
+                            bookDB.execSQL("UPDATE "+tablename+" SET"+" name='"+modify_name+"', subname='"+modify_subname+"' WHERE name='"+select_name+"';");
+                            updateListView();
+                            dialog.dismiss();     //닫기
+                            Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
+                        } catch(Exception e){
+                            Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 });
 
@@ -232,11 +245,16 @@ public class BookActivity extends AppCompatActivity {
                 dl.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        bookDB.execSQL("DELETE FROM "+tablename+" WHERE name='"+select_name+"';");
-                        updateListView();
-                        dialog.dismiss();     //닫기
-                        Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
-                        // Event
+                        try{
+                            bookDB.execSQL("DELETE FROM "+tablename+" WHERE name='"+select_name+"';"); // book Table에 해당 Data 삭제
+                            bookDB.execSQL("DROP TABLE "+select_name+";"); // 해당 Table 삭제
+                            updateListView();
+                            dialog.dismiss();     //닫기
+                            Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
+                        } catch (Exception e){
+                            Toast.makeText(getApplicationContext(), "문제가 발생하였습니다. 개발자에게 문의하세요.",Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 });
 
@@ -257,7 +275,7 @@ public class BookActivity extends AppCompatActivity {
     }
 
     public void updateListView(){
-        ListView listView = findViewById(R.id.listview);
+        ListView listView = findViewById(R.id.book_list);
         BookAdapter adapter = new BookAdapter();
 
         SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);

@@ -44,12 +44,30 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="120dp"/>
 
+        <EditText
+            android:id="@+id/edit_word"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginTop="140dp"
+            android:gravity="center"
+            android:hint="단어"/>
+
         <ImageView
             android:id="@+id/mean_text"
             android:layout_width="130dp"
             android:layout_height="60dp"
             android:layout_marginLeft="170dp"
             android:layout_marginTop="120dp"/>
+
+        <EditText
+            android:id="@+id/edit_mean"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="185dp"
+            android:layout_marginTop="140dp"
+            android:gravity="center"
+            android:hint="뜻"/>
 
         <ImageButton
             android:id="@+id/btn_register"
@@ -61,23 +79,13 @@
             android:scaleType="fitCenter"/>
 
         <ListView
-            android:id="@+id/listview"
+            android:id="@+id/word_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="17dp"
             android:layout_marginRight="17dp"
             android:layout_marginBottom="17dp"
             android:layout_marginTop="200dp"/>
-
-        <ImageButton
-            android:id="@+id/add_book"
-            android:layout_width="70dp"
-            android:layout_height="103dp"
-            android:layout_gravity="right|bottom"
-            android:layout_marginRight="30dp"
-            android:layout_marginBottom="30dp"
-            android:background="#00FF0000"
-            android:scaleType="centerCrop" />
 
 
 

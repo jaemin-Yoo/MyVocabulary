@@ -38,7 +38,7 @@
             android:scaleType="centerCrop"/>
 
         <ListView
-            android:id="@+id/listview"
+            android:id="@+id/book_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="17dp"
