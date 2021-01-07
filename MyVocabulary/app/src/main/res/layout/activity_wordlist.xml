@@ -51,7 +51,9 @@
             android:layout_marginLeft="45dp"
             android:layout_marginTop="140dp"
             android:gravity="center"
-            android:hint="단어"/>
+            android:hint="단어"
+            android:singleLine="true"
+            android:maxLength="16"/>
 
         <ImageView
             android:id="@+id/mean_text"
@@ -67,7 +69,9 @@
             android:layout_marginLeft="185dp"
             android:layout_marginTop="140dp"
             android:gravity="center"
-            android:hint="뜻"/>
+            android:hint="뜻"
+            android:singleLine="true"
+            android:maxLength="16"/>
 
         <ImageButton
             android:id="@+id/btn_register"
@@ -86,6 +90,16 @@
             android:layout_marginRight="17dp"
             android:layout_marginBottom="17dp"
             android:layout_marginTop="200dp"/>
+
+        <ImageButton
+            android:id="@+id/add_many"
+            android:layout_width="100dp"
+            android:layout_height="80dp"
+            android:layout_gravity="right|bottom"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="50dp"
+            android:background="#00FF0000"
+            android:scaleType="centerCrop"/>
 
 
 

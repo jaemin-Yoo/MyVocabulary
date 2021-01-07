@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,7 +37,7 @@ public class BookActivity extends AppCompatActivity {
 
     public String TAG = "Log";
     private ImageButton back, add, home;
-    private ImageView img_book;
+    private TextView state_text;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";
@@ -48,6 +50,8 @@ public class BookActivity extends AppCompatActivity {
     private ListView listView;
     private Booklist bl;
     public static String bk_name;
+
+    private int state = MainActivity.state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +77,9 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 홈화면으로 돌아가기
+                Intent intent = new Intent(BookActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); //액티비티 스택제거
+                startActivity(intent);
             }
         });
 
@@ -83,68 +90,88 @@ public class BookActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(BookActivity.this, WordActivity.class);
-                startActivity(intent);
+                if (state == 0){
+                    // 단어추가
+                    Intent intent = new Intent(BookActivity.this, WordActivity.class);
+                    startActivity(intent);
+                } else {
+                    // 게임시작
+                }
+
                 bl = (Booklist) listView.getAdapter().getItem(i);
-                bk_name = (String) bl.getName();
+                bk_name = bl.getName();
                 Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
             }
         });
 
-        add=findViewById(R.id.add_book);
-        Glide.with(this).load(R.drawable.add_book).into(add);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        state_text = findViewById(R.id.state_text);
 
-                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+        if (state == 0){
+            state_text.setText("단어추가");
+            state_text.setTextColor(Color.parseColor("#8EBB65"));
 
-                final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
-                final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
+            add=findViewById(R.id.add_book);
+            Glide.with(this).load(R.drawable.add_book).into(add);
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
+                    LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
 
-                ad.setTitle("단어장 추가");       // 제목 설정
-                ad.setMessage("단어장 이름");   // 내용 설정
-                ad.setIcon(R.drawable.book);
+                    final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
+                    final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
 
-                ad.setView(et);
+                    AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
 
-                // 확인 버튼 설정
-                ad.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    ad.setTitle("단어장 추가");       // 제목 설정
+                    ad.setMessage("단어장 이름");   // 내용 설정
+                    ad.setIcon(R.drawable.book);
 
-                        // Text 값 받아서 로그 남기기
-                        add_name = et_name.getText().toString();
-                        add_subname = et_subname.getText().toString();
-                        try{
-                            bookDB.execSQL("CREATE TABLE "+add_name
-                                    +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20));");
-                            bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
-                            updateListView();
-                            dialog.dismiss();     //닫기
-                        } catch (Exception e){
-                            Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                    ad.setView(et);
+
+                    // 확인 버튼 설정
+                    ad.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            // Text 값 받아서 로그 남기기
+                            add_name = et_name.getText().toString();
+                            add_subname = et_subname.getText().toString();
+                            if (add_name.length() != 0 && add_subname.length() != 0){
+                                try{
+                                    bookDB.execSQL("CREATE TABLE "+add_name
+                                            +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20));");
+                                    bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
+                                    updateListView();
+                                    dialog.dismiss();     //닫기
+                                } catch (Exception e){
+                                    Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"빈칸을 채우세요.",Toast.LENGTH_LONG).show();
+                            }
                         }
+                    });
 
-                        // Event
-                    }
-                });
+                    // 취소 버튼 설정
+                    ad.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();     //닫기
+                            // Event
+                        }
+                    });
 
-                // 취소 버튼 설정
-                ad.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();     //닫기
-                        // Event
-                    }
-                });
-
-                ad.show();
-            }
-        });
+                    ad.show();
+                }
+            });
+        }
+        else{
+            state_text.setText("게임시작");
+            state_text.setTextColor(Color.parseColor("#489DD8"));
+        }
 
         SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         Cursor c = ReadDB.rawQuery("SELECT * FROM "+tablename, null);

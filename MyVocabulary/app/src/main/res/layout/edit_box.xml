@@ -11,13 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="50dp"
-        android:hint="Name"/>
+        android:hint="Name"
+        android:singleLine="true"
+        android:maxLength="16"/>
     <EditText
         android:id="@+id/edit_subname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="50dp"
-        android:hint="SubName"/>
+        android:hint="SubName"
+        android:singleLine="true"
+        android:maxLength="16"/>
 
 
 </LinearLayout>

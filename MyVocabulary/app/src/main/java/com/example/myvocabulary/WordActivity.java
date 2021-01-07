@@ -10,6 +10,7 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 public class WordActivity extends AppCompatActivity {
 
     public String TAG = "Log";
-    private ImageButton back, home, register, delete;
+    private ImageButton back, home, register, delete, many_word;
     private ImageView word, mean;
     private TextView title;
     private String bk_name = BookActivity.bk_name;
@@ -72,6 +73,9 @@ public class WordActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 홈화면으로 돌아가기
+                Intent intent = new Intent(WordActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); //액티비티 스택제거
+                startActivity(intent);
             }
         });
 
@@ -131,6 +135,15 @@ public class WordActivity extends AppCompatActivity {
                 } while (c.moveToNext());
             }
         }
+
+        many_word = findViewById(R.id.add_many);
+        Glide.with(this).load(R.drawable.add_many).into(many_word);
+        many_word.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 한꺼번에 단어추가
+            }
+        });
     }
 
 

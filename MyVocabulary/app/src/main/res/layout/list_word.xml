@@ -20,7 +20,10 @@
             android:text="첫번째"
             android:textSize="20dp"
             android:textColor="#000"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"/>
+        <!-- singleLine + ellipsize = 글자수 초과 (...) 표시 -->
 
         <TextView
             android:id="@+id/mean"
@@ -28,8 +31,9 @@
             android:layout_height="match_parent"
             android:text=" SubText"
             android:textSize="20dp"
-            android:textColor="#000"/>
-
+            android:textColor="#000"
+            android:maxLines="1"
+            android:ellipsize="end"/>
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton add, test, exit;
+    public static int state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                state = 0;
                 Log.d("click", "Add");
                 Intent intent = new Intent(MainActivity.this, BookActivity.class);
                 startActivity(intent);
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                state = 1;
                 Log.d("click", "Test");
                 Intent intent = new Intent(MainActivity.this, BookActivity.class);
                 startActivity(intent);
