@@ -11,70 +11,163 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.example.myvocabulary.OutlineTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="50dp"
-            android:textSize="40dp"
-            android:textStyle="bold"
-            android:text="단어장 선택"
-            android:fontFamily="@font/blackhansansregular"
-            app:textStroke="true"
-            app:textStrokeWidth="6.0"
-            app:textStrokeColor="#000"/>
-
-        <com.example.myvocabulary.OutlineTextView
-            android:id="@+id/state_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="90dp"
-            android:textSize="30dp"
-            android:fontFamily="@font/blackhansansregular"
-            app:textStroke="true"
-            app:textStrokeWidth="8.0"
-            app:textStrokeColor="#000"/>
-
-        <ImageButton
-            android:id="@+id/btn_back"
-            android:layout_width="40dp"
-            android:layout_height="36dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="40dp"
-            android:background="#00FF0000"
-            android:scaleType="centerCrop"/>
-
-        <ImageButton
-            android:id="@+id/btn_home"
-            android:layout_width="40dp"
-            android:layout_height="36dp"
-            android:layout_gravity="right"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="40dp"
-            android:background="#00FF0000"
-            android:scaleType="centerCrop"/>
-
-        <ListView
-            android:id="@+id/book_list"
+        <FrameLayout
+            android:id="@+id/book_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="17dp"
-            android:layout_marginRight="17dp"
-            android:layout_marginBottom="17dp"
-            android:layout_marginTop="150dp"/>
+            android:layout_height="match_parent">
 
-        <ImageButton
-            android:id="@+id/add_book"
-            android:layout_width="70dp"
-            android:layout_height="103dp"
-            android:layout_gravity="right|bottom"
-            android:layout_marginRight="30dp"
-            android:layout_marginBottom="30dp"
-            android:background="#00FF0000"
-            android:scaleType="centerCrop" />
+            <com.example.myvocabulary.OutlineTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="50dp"
+                android:textSize="40dp"
+                android:textStyle="bold"
+                android:text="단어장 선택"
+                android:fontFamily="@font/blackhansansregular"
+                app:textStroke="true"
+                app:textStrokeWidth="6.0"
+                app:textStrokeColor="#000"/>
 
+            <com.example.myvocabulary.OutlineTextView
+                android:id="@+id/state_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="90dp"
+                android:textSize="30dp"
+                android:fontFamily="@font/blackhansansregular"
+                app:textStroke="true"
+                app:textStrokeWidth="8.0"
+                app:textStrokeColor="#000"/>
 
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="40dp"
+                android:layout_height="36dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="40dp"
+                android:background="#00FF0000"
+                android:scaleType="centerCrop"/>
+
+            <ImageButton
+                android:id="@+id/btn_home"
+                android:layout_width="40dp"
+                android:layout_height="36dp"
+                android:layout_gravity="right"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="40dp"
+                android:background="#00FF0000"
+                android:scaleType="centerCrop"/>
+
+            <ListView
+                android:id="@+id/book_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginBottom="17dp"
+                android:layout_marginTop="150dp"/>
+
+            <ImageButton
+                android:id="@+id/add_book"
+                android:layout_width="70dp"
+                android:layout_height="103dp"
+                android:layout_gravity="right|bottom"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="30dp"
+                android:background="#00FF0000"
+                android:scaleType="centerCrop" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/game_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="40dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#777777">
+
+                <ImageButton
+                    android:id="@+id/game_exit"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="right"
+                    android:scaleType="centerCrop"
+                    android:background="#00FF0000"/>
+
+                <TextView
+                    android:id="@+id/game_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="100dp"
+                    android:textSize="40dp"
+                    android:textStyle="bold"
+                    android:textColor="#000"
+                    android:text="단어"/>
+
+                <ImageButton
+                    android:id="@+id/touch"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:scaleType="centerCrop"
+                    android:background="#00FF0000"/>
+
+                <FrameLayout
+                    android:id="@+id/touch_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/touch_blank"
+                        android:layout_width="300dp"
+                        android:layout_height="300dp"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:scaleType="centerCrop"
+                        android:background="#00FF0000"/>
+
+                    <TextView
+                        android:id="@+id/game_mean"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="80dp"
+                        android:gravity="center"
+                        android:textSize="30dp"
+                        android:textStyle="bold"
+                        android:textColor="#000"
+                        android:text="뜻"/>
+
+                    <ImageButton
+                        android:id="@+id/incorrect"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="30dp"
+                        android:scaleType="fitCenter"
+                        android:background="#00FF0000"/>
+
+                    <ImageButton
+                        android:id="@+id/correct"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginBottom="30dp"
+                        android:scaleType="fitCenter"
+                        android:background="#00FF0000"/>
+
+                </FrameLayout>
+
+            </FrameLayout>
+
+        </FrameLayout>
 
     </FrameLayout>
 

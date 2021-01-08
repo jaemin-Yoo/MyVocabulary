@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,8 +37,10 @@ import java.util.ArrayList;
 public class BookActivity extends AppCompatActivity {
 
     public String TAG = "Log";
-    private ImageButton back, add, home;
-    private TextView state_text;
+    private ImageButton back, add, home, game_exit, touch, incorrect, correct;
+    private ImageView touch_blank;
+    private TextView state_text, game_word, game_mean;
+    private FrameLayout game_layout, touch_layout;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";
@@ -83,6 +86,54 @@ public class BookActivity extends AppCompatActivity {
             }
         });
 
+        game_exit = findViewById(R.id.game_exit);
+        Glide.with(this).load(R.drawable.exit).into(game_exit);
+        game_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                game_layout.setVisibility(View.INVISIBLE);
+                disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+            }
+        });
+
+        touch = findViewById(R.id.touch);
+        Glide.with(this).load(R.drawable.touch).into(touch);
+        touch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG,"TOUCH");
+                // 터치 버튼 비활성화 고려 ( 필요없는 것 같기도 함 )
+                touch_layout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        touch_blank = findViewById(R.id.touch_blank);
+        Glide.with(this).load(R.drawable.touch_blank).into(touch_blank);
+
+        incorrect = findViewById(R.id.incorrect);
+        Glide.with(this).load(R.drawable.incorrect).into(incorrect);
+        incorrect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 틀렸어요, 다음 단어, 우선순위 증가
+            }
+        });
+
+        correct = findViewById(R.id.correct);
+        Glide.with(this).load(R.drawable.correct).into(correct);
+        correct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 맞췄어요, 다음 단어
+            }
+        });
+
+        game_layout = findViewById(R.id.game_layout);
+        touch_layout = findViewById(R.id.touch_layout);
+        game_layout.setVisibility(View.INVISIBLE);
+
+        game_word = findViewById(R.id.game_word);
+
         listView = findViewById(R.id.book_list);
         BookAdapter adapter = new BookAdapter();
         registerForContextMenu(listView); // 리스트뷰 Context menu 등록
@@ -96,6 +147,11 @@ public class BookActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else {
                     // 게임시작
+                    game_layout.setVisibility(View.VISIBLE);
+                    touch_layout.setVisibility(View.INVISIBLE);
+                    disableEnableControls(false, (ViewGroup)findViewById(R.id.book_layout));
+
+                    // 단어 select
                 }
 
                 bl = (Booklist) listView.getAdapter().getItem(i);
@@ -184,6 +240,16 @@ public class BookActivity extends AppCompatActivity {
                     adapter.addItem(new Booklist(Name, Subname, R.drawable.book));
                     listView.setAdapter(adapter);
                 } while (c.moveToNext());
+            }
+        }
+    }
+
+    private void disableEnableControls(boolean enable, ViewGroup vg){
+        for (int i = 0; i < vg.getChildCount(); i++){
+            View child = vg.getChildAt(i);
+            child.setEnabled(enable);
+            if (child instanceof ViewGroup){
+                disableEnableControls(enable, (ViewGroup)child);
             }
         }
     }
