@@ -33,13 +33,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class BookActivity extends AppCompatActivity {
 
     public String TAG = "Log";
     private ImageButton back, add, home, game_exit, touch, incorrect, correct;
     private ImageView touch_blank;
-    private TextView state_text, game_word, game_mean;
+    private TextView state_text, game_word, game_mean, gm_count;
     private FrameLayout game_layout, touch_layout;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
@@ -50,9 +51,16 @@ public class BookActivity extends AppCompatActivity {
     private String modify_subname;
     private String select_name;
     private String select_subname;
+    private String[] wd_arr;
+    private String[] mn_arr;
+    private int[] rd_arr;
     private ListView listView;
     private Booklist bl;
     public static String bk_name;
+    private SQLiteDatabase ReadDB;
+    private int count = 0;
+    private int c_cnt = 0;
+    //private boolean finish = false;
 
     private int state = MainActivity.state;
 
@@ -64,6 +72,8 @@ public class BookActivity extends AppCompatActivity {
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         bookDB.execSQL("CREATE TABLE IF NOT EXISTS "+tablename
                 +" (name VARCHAR(10) PRIMARY KEY, subname VARCHAR(20));");
+
+        ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
 
         back=findViewById(R.id.btn_back);
         Glide.with(this).load(R.drawable.back).into(back); // 이미지 로드
@@ -93,6 +103,7 @@ public class BookActivity extends AppCompatActivity {
             public void onClick(View view) {
                 game_layout.setVisibility(View.INVISIBLE);
                 disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+                count = 0;
             }
         });
 
@@ -116,6 +127,15 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 틀렸어요, 다음 단어, 우선순위 증가
+                if (count!=c_cnt){
+                    nextWord();
+                } else{
+                    //touch_layout.setVisibility(View.VISIBLE);
+                    game_layout.setVisibility(View.INVISIBLE);
+                    disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+                    count = 0;
+                }
+                Log.d(TAG,count+" (count)");
             }
         });
 
@@ -125,6 +145,15 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 맞췄어요, 다음 단어
+                if (count!=c_cnt){
+                    nextWord();
+                } else{
+                    //touch_layout.setVisibility(View.VISIBLE);
+                    game_layout.setVisibility(View.INVISIBLE);
+                    disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+                    count = 0;
+                }
+                Log.d(TAG,count+" (count)");
             }
         });
 
@@ -133,6 +162,8 @@ public class BookActivity extends AppCompatActivity {
         game_layout.setVisibility(View.INVISIBLE);
 
         game_word = findViewById(R.id.game_word);
+        game_mean = findViewById(R.id.game_mean);
+        gm_count = findViewById(R.id.gm_count);
 
         listView = findViewById(R.id.book_list);
         BookAdapter adapter = new BookAdapter();
@@ -141,22 +172,54 @@ public class BookActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                bl = (Booklist) listView.getAdapter().getItem(i);
+                bk_name = bl.getName();
+
                 if (state == 0){
                     // 단어추가
                     Intent intent = new Intent(BookActivity.this, WordActivity.class);
                     startActivity(intent);
                 } else {
                     // 게임시작
-                    game_layout.setVisibility(View.VISIBLE);
-                    touch_layout.setVisibility(View.INVISIBLE);
-                    disableEnableControls(false, (ViewGroup)findViewById(R.id.book_layout));
+                    Cursor cursor = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
+                    c_cnt = cursor.getCount();
 
-                    // 단어 select
+                    if (c_cnt != 0){
+                        game_layout.setVisibility(View.VISIBLE);
+                        disableEnableControls(false, (ViewGroup)findViewById(R.id.book_layout));
+
+                        // 단어 select
+                        Log.d(TAG,c_cnt+" (c_cnt)");
+                        wd_arr = new String[c_cnt];
+                        mn_arr = new String[c_cnt];
+                        rd_arr = new int[c_cnt];
+                        int j = 0;
+                        if(cursor!=null){
+                            if(cursor.moveToFirst()){
+                                do{
+                                    wd_arr[j] = cursor.getString(cursor.getColumnIndex("word"));
+                                    mn_arr[j] = cursor.getString(cursor.getColumnIndex("mean"));
+                                    j++;
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        Random random = new Random();
+
+                        for (int a=0; a<c_cnt; a++){
+                            rd_arr[a] = random.nextInt(c_cnt);
+                            for (int b=0; b<a; b++){
+                                if (rd_arr[a] == rd_arr[b]){
+                                    a--;
+                                }
+                            }
+                        }
+                        nextWord();
+
+                        Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
+                    } else{
+                        Toast.makeText(getApplicationContext(),"최소 1개 이상의 단어를 등록하세요.", Toast.LENGTH_LONG).show();
+                    }
                 }
-
-                bl = (Booklist) listView.getAdapter().getItem(i);
-                bk_name = bl.getName();
-                Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -229,9 +292,7 @@ public class BookActivity extends AppCompatActivity {
             state_text.setTextColor(Color.parseColor("#489DD8"));
         }
 
-        SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         Cursor c = ReadDB.rawQuery("SELECT * FROM "+tablename, null);
-
         if(c!=null){
             if(c.moveToFirst()){
                 do{
@@ -242,6 +303,14 @@ public class BookActivity extends AppCompatActivity {
                 } while (c.moveToNext());
             }
         }
+    }
+
+    private void nextWord(){
+        touch_layout.setVisibility(View.INVISIBLE);
+        game_word.setText(wd_arr[rd_arr[count]]);
+        game_mean.setText(mn_arr[rd_arr[count]]);
+        count++;
+        gm_count.setText(count+"/"+c_cnt);
     }
 
     private void disableEnableControls(boolean enable, ViewGroup vg){

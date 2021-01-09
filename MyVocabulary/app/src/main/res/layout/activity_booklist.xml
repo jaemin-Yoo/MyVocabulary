@@ -91,7 +91,15 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#777777">
+                android:background="#AAAAAA">
+
+                <TextView
+                    android:id="@+id/gm_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="20dp"
+                    android:textColor="#000"/>
 
                 <ImageButton
                     android:id="@+id/game_exit"
@@ -109,8 +117,7 @@
                     android:layout_marginTop="100dp"
                     android:textSize="40dp"
                     android:textStyle="bold"
-                    android:textColor="#000"
-                    android:text="단어"/>
+                    android:textColor="#000"/>
 
                 <ImageButton
                     android:id="@+id/touch"
@@ -142,8 +149,7 @@
                         android:gravity="center"
                         android:textSize="30dp"
                         android:textStyle="bold"
-                        android:textColor="#000"
-                        android:text="뜻"/>
+                        android:textColor="#000"/>
 
                     <ImageButton
                         android:id="@+id/incorrect"

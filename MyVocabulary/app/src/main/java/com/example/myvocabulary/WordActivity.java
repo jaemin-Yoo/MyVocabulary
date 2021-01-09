@@ -40,7 +40,7 @@ public class WordActivity extends AppCompatActivity {
     public String TAG = "Log";
     private ImageButton back, home, register, delete, many_word;
     private ImageView word, mean;
-    private TextView title;
+    private TextView title, count;
     private String bk_name = BookActivity.bk_name;
     private ListView listView;
     private String add_word, add_mean;
@@ -118,23 +118,7 @@ public class WordActivity extends AppCompatActivity {
             }
         });
 
-
-        listView = findViewById(R.id.word_list);
-        WordAdapter adapter = new WordAdapter();
-
-        SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
-        Cursor c = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
-
-        if(c!=null){
-            if(c.moveToFirst()){
-                do{
-                    String Name = c.getString(c.getColumnIndex("word"));
-                    String Subname = c.getString(c.getColumnIndex("mean"));
-                    adapter.addItem(new Wordlist(Name, Subname, R.drawable.delete));
-                    listView.setAdapter(adapter);
-                } while (c.moveToNext());
-            }
-        }
+        updateListView();
 
         many_word = findViewById(R.id.add_many);
         Glide.with(this).load(R.drawable.add_many).into(many_word);
@@ -148,11 +132,14 @@ public class WordActivity extends AppCompatActivity {
 
 
     public void updateListView(){
-        ListView listView = findViewById(R.id.word_list);
+        listView = findViewById(R.id.word_list);
         WordAdapter adapter = new WordAdapter();
 
         SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         Cursor c = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
+
+        count = findViewById(R.id.wl_count);
+        count.setText(c.getCount()+"개");
 
         if(c!=null && c.getCount() != 0){
             if(c.moveToFirst()){

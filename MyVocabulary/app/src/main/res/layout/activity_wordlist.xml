@@ -16,7 +16,16 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="50dp"
             android:textSize="40dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:text="TOEIC"/>
+
+        <TextView
+            android:id="@+id/wl_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp"
+            android:textSize="10dp"/>
 
         <ImageButton
             android:id="@+id/btn_back"
