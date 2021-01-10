@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+
 public class WordlistView extends LinearLayout {
 
     TextView textView, textView2;
@@ -38,6 +40,7 @@ public class WordlistView extends LinearLayout {
         imageView = findViewById(R.id.btn_delete);
 
 
+
     }
 
     public void setName(String word){
@@ -48,7 +51,7 @@ public class WordlistView extends LinearLayout {
         textView2.setText(mean);
     }
 
-    public void setWord(int resId){
-        imageView.setImageResource(resId);
+    public void setWord(int url){
+        Glide.with(this).load(url).into(imageView);
     }
 }

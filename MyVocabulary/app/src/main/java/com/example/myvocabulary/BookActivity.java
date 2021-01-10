@@ -31,6 +31,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -42,6 +43,7 @@ public class BookActivity extends AppCompatActivity {
     private ImageView touch_blank;
     private TextView state_text, game_word, game_mean, gm_count;
     private FrameLayout game_layout, touch_layout;
+    private LinearLayout background;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";

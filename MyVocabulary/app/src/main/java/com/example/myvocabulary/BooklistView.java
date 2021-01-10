@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+
 public class BooklistView extends LinearLayout {
 
     TextView textView, textView2;
@@ -40,7 +42,7 @@ public class BooklistView extends LinearLayout {
         textView2.setText(subname);
     }
 
-    public void setBook(int resId){
-        imageView.setImageResource(resId);
+    public void setBook(int url){
+        Glide.with(this).load(url).into(imageView);
     }
 }
