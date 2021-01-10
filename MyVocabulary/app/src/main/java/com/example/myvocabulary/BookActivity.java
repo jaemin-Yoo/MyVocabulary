@@ -130,10 +130,7 @@ public class BookActivity extends AppCompatActivity {
                 if (count!=c_cnt){
                     nextWord();
                 } else{
-                    //touch_layout.setVisibility(View.VISIBLE);
-                    game_layout.setVisibility(View.INVISIBLE);
-                    disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
-                    count = 0;
+                    ending();
                 }
                 Log.d(TAG,count+" (count)");
             }
@@ -148,10 +145,7 @@ public class BookActivity extends AppCompatActivity {
                 if (count!=c_cnt){
                     nextWord();
                 } else{
-                    //touch_layout.setVisibility(View.VISIBLE);
-                    game_layout.setVisibility(View.INVISIBLE);
-                    disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
-                    count = 0;
+                    ending();
                 }
                 Log.d(TAG,count+" (count)");
             }
@@ -192,7 +186,7 @@ public class BookActivity extends AppCompatActivity {
                         Log.d(TAG,c_cnt+" (c_cnt)");
                         wd_arr = new String[c_cnt];
                         mn_arr = new String[c_cnt];
-                        rd_arr = new int[c_cnt];
+
                         int j = 0;
                         if(cursor!=null){
                             if(cursor.moveToFirst()){
@@ -203,16 +197,7 @@ public class BookActivity extends AppCompatActivity {
                                 } while (cursor.moveToNext());
                             }
                         }
-                        Random random = new Random();
-
-                        for (int a=0; a<c_cnt; a++){
-                            rd_arr[a] = random.nextInt(c_cnt);
-                            for (int b=0; b<a; b++){
-                                if (rd_arr[a] == rd_arr[b]){
-                                    a--;
-                                }
-                            }
-                        }
+                        randomNumber();
                         nextWord();
 
                         Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
@@ -303,6 +288,53 @@ public class BookActivity extends AppCompatActivity {
                 } while (c.moveToNext());
             }
         }
+    }
+
+    private void randomNumber(){
+        Random random = new Random();
+        rd_arr = new int[c_cnt];
+
+        for (int a=0; a<c_cnt; a++){
+            rd_arr[a] = random.nextInt(c_cnt);
+            for (int b=0; b<a; b++){
+                if (rd_arr[a] == rd_arr[b]){
+                    a--;
+                }
+            }
+        }
+    }
+
+    private void ending(){
+        AlertDialog.Builder ending = new AlertDialog.Builder(BookActivity.this);
+
+        ending.setTitle("게임종료");       // 제목 설정
+        ending.setMessage("모든 단어를 테스트하였습니다." +
+                "\n한번 더 하시겠습니까?");   // 내용 설정
+        ending.setIcon(R.drawable.baby);
+
+        // 확인 버튼 설정
+        ending.setPositiveButton("예", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();     //닫기
+                count = 0;
+                randomNumber();
+                nextWord();
+            }
+        });
+
+        // 취소 버튼 설정
+        ending.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();     //닫기
+                game_layout.setVisibility(View.INVISIBLE);
+                disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+                count = 0;
+            }
+        });
+
+        ending.show();
     }
 
     private void nextWord(){
