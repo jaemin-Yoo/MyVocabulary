@@ -85,7 +85,7 @@ public class BookActivity extends AppCompatActivity {
         });
 
         home = findViewById(R.id.btn_home);
-        Glide.with(this).load(R.drawable.home).into(home);
+        Glide.with(this).load("https://i.imgur.com/BmGIFS3.png").into(home);
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,7 +108,7 @@ public class BookActivity extends AppCompatActivity {
         });
 
         touch = findViewById(R.id.touch);
-        Glide.with(this).load(R.drawable.touch).into(touch);
+        Glide.with(this).load("https://i.imgur.com/U9qzgT6.png").into(touch);
         touch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,10 +119,10 @@ public class BookActivity extends AppCompatActivity {
         });
 
         touch_blank = findViewById(R.id.touch_blank);
-        Glide.with(this).load(R.drawable.touch_blank).into(touch_blank);
+        Glide.with(this).load("https://i.imgur.com/7WKlNlK.png").into(touch_blank);
 
         incorrect = findViewById(R.id.incorrect);
-        Glide.with(this).load(R.drawable.incorrect).into(incorrect);
+        Glide.with(this).load("https://i.imgur.com/0kbTDA9.png").into(incorrect);
         incorrect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,7 +137,7 @@ public class BookActivity extends AppCompatActivity {
         });
 
         correct = findViewById(R.id.correct);
-        Glide.with(this).load(R.drawable.correct).into(correct);
+        Glide.with(this).load("https://i.imgur.com/nSndJ2m.png").into(correct);
         correct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

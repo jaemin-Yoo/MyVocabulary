@@ -68,7 +68,7 @@ public class WordActivity extends AppCompatActivity {
         });
 
         home = findViewById(R.id.btn_home);
-        Glide.with(this).load(R.drawable.home).into(home);
+        Glide.with(this).load("https://i.imgur.com/BmGIFS3.png").into(home);
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,13 +80,13 @@ public class WordActivity extends AppCompatActivity {
         });
 
         word = findViewById(R.id.word_text);
-        Glide.with(this).load(R.drawable.word_text).into(word);
+        Glide.with(this).load("https://i.imgur.com/9fWB5g6.png").into(word);
 
         mean = findViewById(R.id.mean_text);
-        Glide.with(this).load(R.drawable.mean_text).into(mean);
+        Glide.with(this).load("https://i.imgur.com/8panHgJ.png").into(mean);
 
         register = findViewById(R.id.btn_register);
-        Glide.with(this).load(R.drawable.register).into(register);
+        Glide.with(this).load("https://i.imgur.com/3ah17I3.png").into(register);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,7 +121,7 @@ public class WordActivity extends AppCompatActivity {
         updateListView();
 
         many_word = findViewById(R.id.add_many);
-        Glide.with(this).load(R.drawable.add_many).into(many_word);
+        Glide.with(this).load("https://i.imgur.com/oBWlKev.png").into(many_word);
         many_word.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
