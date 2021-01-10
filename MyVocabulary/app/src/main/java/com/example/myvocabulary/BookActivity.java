@@ -60,7 +60,6 @@ public class BookActivity extends AppCompatActivity {
     private SQLiteDatabase ReadDB;
     private int count = 0;
     private int c_cnt = 0;
-    //private boolean finish = false;
 
     private int state = MainActivity.state;
 
@@ -76,7 +75,7 @@ public class BookActivity extends AppCompatActivity {
         ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
 
         back=findViewById(R.id.btn_back);
-        Glide.with(this).load(R.drawable.back).into(back); // 이미지 로드
+        Glide.with(this).load("https://i.imgur.com/iYM8Gc1.png").into(back); // 이미지 로드
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,7 +96,7 @@ public class BookActivity extends AppCompatActivity {
         });
 
         game_exit = findViewById(R.id.game_exit);
-        Glide.with(this).load(R.drawable.exit).into(game_exit);
+        Glide.with(this).load("https://i.imgur.com/BESADN8.png").into(game_exit);
         game_exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -215,7 +214,7 @@ public class BookActivity extends AppCompatActivity {
             state_text.setTextColor(Color.parseColor("#8EBB65"));
 
             add=findViewById(R.id.add_book);
-            Glide.with(this).load(R.drawable.add_book).into(add);
+            Glide.with(this).load("https://i.imgur.com/6tbIs0H.png").into(add);
             add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

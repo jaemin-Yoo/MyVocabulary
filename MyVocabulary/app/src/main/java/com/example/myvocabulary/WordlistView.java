@@ -37,17 +37,7 @@ public class WordlistView extends LinearLayout {
         textView2 = findViewById(R.id.mean);
         imageView = findViewById(R.id.btn_delete);
 
-        /*
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String text = view.getTag().toString();
-                //Toast.makeText(getContext(),text,Toast.LENGTH_LONG).show();
-                Log.d("HI",text);
-            }
-        });
 
-         */
     }
 
     public void setName(String word){

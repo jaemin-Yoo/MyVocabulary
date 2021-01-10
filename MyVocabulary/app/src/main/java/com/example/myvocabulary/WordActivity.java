@@ -59,7 +59,7 @@ public class WordActivity extends AppCompatActivity {
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
 
         back=findViewById(R.id.btn_back);
-        Glide.with(this).load(R.drawable.back).into(back); // 이미지 로드
+        Glide.with(this).load("https://i.imgur.com/iYM8Gc1.png").into(back); // 이미지 로드
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

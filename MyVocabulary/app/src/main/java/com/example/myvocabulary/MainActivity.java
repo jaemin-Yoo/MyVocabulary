@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         add=findViewById(R.id.btn_add);
-        Glide.with(this).load(R.drawable.btn_add).into(add);
+        Glide.with(this).load("https://i.imgur.com/aZFNhx0.png").into(add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         test=findViewById(R.id.btn_test);
-        Glide.with(this).load(R.drawable.btn_test).into(test);
+        Glide.with(this).load("https://i.imgur.com/Bz1lFfd.png").into(test);
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         exit=findViewById(R.id.btn_exit);
-        Glide.with(this).load(R.drawable.btn_exit).into(exit);
+        Glide.with(this).load("https://i.imgur.com/vHjbVf6.png").into(exit);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
