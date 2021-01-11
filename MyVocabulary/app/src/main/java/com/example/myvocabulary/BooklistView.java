@@ -42,7 +42,7 @@ public class BooklistView extends LinearLayout {
         textView2.setText(subname);
     }
 
-    public void setBook(int url){
+    public void setBook(String url){
         Glide.with(this).load(url).into(imageView);
     }
 }

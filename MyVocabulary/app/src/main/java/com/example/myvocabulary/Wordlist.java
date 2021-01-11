@@ -3,12 +3,12 @@ package com.example.myvocabulary;
 public class Wordlist {
     String name;
     String subname;
-    int resId;
+    String Url;
 
-    public Wordlist(String name, String subname, int resId){
+    public Wordlist(String name, String subname, String Url){
         this.name = name;
         this.subname = subname;
-        this.resId = resId;
+        this.Url = Url;
     }
 
     public String getName() {
@@ -27,8 +27,8 @@ public class Wordlist {
         this.subname = subname;
     }
 
-    public int getResId() {
-        return resId;
+    public String getUrl() {
+        return Url;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Wordlist {
         return "Wordlist{" +
                 "name='" + name + '\'' +
                 ", subname='" + subname + '\'' +
-                ", resId=" + resId +
+                ", Url=" + Url +
                 '}';
     }
 }

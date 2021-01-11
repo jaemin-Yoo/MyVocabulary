@@ -44,7 +44,11 @@ public class WordActivity extends AppCompatActivity {
     private String bk_name = BookActivity.bk_name;
     private ListView listView;
     private String add_word, add_mean;
+    private LinearLayout background;
+    private Wordlist wl;
+    private String select_name, select_subname, modify_name, modify_subname;
 
+    private MyAsyncTask myAsyncTask = new MyAsyncTask();
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
 
@@ -52,6 +56,9 @@ public class WordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wordlist);
+
+        background = findViewById(R.id.background);
+        myAsyncTask.executeTask(background); // 백그라운드 url 설정
 
         title = findViewById(R.id.title);
         title.setText(bk_name); // 단어장 이름
@@ -76,6 +83,71 @@ public class WordActivity extends AppCompatActivity {
                 Intent intent = new Intent(WordActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); //액티비티 스택제거
                 startActivity(intent);
+            }
+        });
+
+        listView = findViewById(R.id.word_list);
+        listView.setFocusable(false); // 리스트뷰와 리스트뷰 내 아이템 둘 다 클릭 가능하도록 설정
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                wl = (Wordlist) listView.getAdapter().getItem(i);
+                select_name = wl.getName();
+                select_subname = wl.getSubname();
+
+                Toast.makeText(getApplicationContext(),select_name, Toast.LENGTH_SHORT).show();
+                Log.d(TAG,select_name);
+
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+
+                final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
+                final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
+
+                AlertDialog.Builder md = new AlertDialog.Builder(WordActivity.this);
+
+                md.setTitle("단어장 수정");       // 제목 설정
+                md.setMessage("수정 할 단어장 이름을 입력하세요.");   // 내용 설정
+                md.setIcon(R.drawable.book);
+
+                // EditText 삽입하기
+
+                md.setView(et);
+                et_name.setText(select_name);
+                et_subname.setText(select_subname);
+
+
+                // 확인 버튼 설정
+                md.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        // Text 값 받아서 로그 남기기
+                        modify_name = et_name.getText().toString();
+                        modify_subname = et_subname.getText().toString();
+
+                        try{
+                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" word='"+modify_name+"', mean='"+modify_subname+"' WHERE word='"+select_name+"';");
+                            updateListView();
+                            dialog.dismiss();     //닫기
+                            Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
+                        } catch(Exception e){
+                            Toast.makeText(getApplicationContext(),"에러:동일한 단어가 존재합니다.",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                });
+
+                // 취소 버튼 설정
+                md.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();     //닫기
+                        // Event
+                    }
+                });
+
+                md.show();
             }
         });
 
@@ -132,7 +204,6 @@ public class WordActivity extends AppCompatActivity {
 
 
     public void updateListView(){
-        listView = findViewById(R.id.word_list);
         WordAdapter adapter = new WordAdapter();
 
         SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
@@ -146,7 +217,7 @@ public class WordActivity extends AppCompatActivity {
                 do{
                     String Name = c.getString(c.getColumnIndex("word"));
                     String Subname = c.getString(c.getColumnIndex("mean"));
-                    adapter.addItem(new Wordlist(Name, Subname, R.drawable.delete));
+                    adapter.addItem(new Wordlist(Name, Subname, "https://i.imgur.com/R4p7yBK.png"));
                     listView.setAdapter(adapter);
                 } while (c.moveToNext());
             }
@@ -192,11 +263,13 @@ public class WordActivity extends AppCompatActivity {
             Wordlist item = items.get(i);
             wordlistView.setName(item.getName());
             wordlistView.setSubname(item.getSubname());
-            wordlistView.setWord(item.getResId());
+            wordlistView.setWord(item.getUrl());
 
             final String delete_word = item.getName();
 
             delete = wordlistView.findViewById(R.id.btn_delete);
+            delete.setFocusable(false); // 리스트뷰와 리스트뷰 내 아이템 둘 다 클릭 가능하도록 설정
+
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -3,9 +3,14 @@ package com.example.myvocabulary;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -27,12 +32,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -42,8 +58,8 @@ public class BookActivity extends AppCompatActivity {
     private ImageButton back, add, home, game_exit, touch, incorrect, correct;
     private ImageView touch_blank;
     private TextView state_text, game_word, game_mean, gm_count;
-    private FrameLayout game_layout, touch_layout;
     private LinearLayout background;
+    private FrameLayout game_layout, touch_layout;
     SQLiteDatabase bookDB = null;
     private final String dbname = "MyVocabulary";
     private final String tablename = "book";
@@ -64,11 +80,16 @@ public class BookActivity extends AppCompatActivity {
     private int c_cnt = 0;
 
     private int state = MainActivity.state;
+    private MyAsyncTask myAsyncTask = new MyAsyncTask();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booklist);
+
+
+        background = findViewById(R.id.background);
+        myAsyncTask.executeTask(background);
 
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         bookDB.execSQL("CREATE TABLE IF NOT EXISTS "+tablename
@@ -227,7 +248,7 @@ public class BookActivity extends AppCompatActivity {
                     final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
                     final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
 
-                    AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
+                    final AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
 
                     ad.setTitle("단어장 추가");       // 제목 설정
                     ad.setMessage("단어장 이름");   // 내용 설정
@@ -236,7 +257,7 @@ public class BookActivity extends AppCompatActivity {
                     ad.setView(et);
 
                     // 확인 버튼 설정
-                    ad.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    ad.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -261,7 +282,7 @@ public class BookActivity extends AppCompatActivity {
                     });
 
                     // 취소 버튼 설정
-                    ad.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();     //닫기
@@ -278,17 +299,7 @@ public class BookActivity extends AppCompatActivity {
             state_text.setTextColor(Color.parseColor("#489DD8"));
         }
 
-        Cursor c = ReadDB.rawQuery("SELECT * FROM "+tablename, null);
-        if(c!=null){
-            if(c.moveToFirst()){
-                do{
-                    String Name = c.getString(c.getColumnIndex("name"));
-                    String Subname = c.getString(c.getColumnIndex("subname"));
-                    adapter.addItem(new Booklist(Name, Subname, R.drawable.book));
-                    listView.setAdapter(adapter);
-                } while (c.moveToNext());
-            }
-        }
+        updateListView();
     }
 
     private void randomNumber(){
@@ -481,7 +492,7 @@ public class BookActivity extends AppCompatActivity {
                 do{
                     String Name = c.getString(c.getColumnIndex("name"));
                     String Subname = c.getString(c.getColumnIndex("subname"));
-                    adapter.addItem(new Booklist(Name, Subname, R.drawable.book));
+                    adapter.addItem(new Booklist(Name, Subname, "https://i.imgur.com/ztiLy07.png"));
                     listView.setAdapter(adapter);
                 } while (c.moveToNext());
             }
@@ -526,7 +537,7 @@ public class BookActivity extends AppCompatActivity {
             Booklist item = items.get(i);
             booklistView.setName(item.getName());
             booklistView.setSubname(item.getSubname());
-            booklistView.setBook(item.getResId());
+            booklistView.setBook(item.getUrl());
             return booklistView;
         }
 

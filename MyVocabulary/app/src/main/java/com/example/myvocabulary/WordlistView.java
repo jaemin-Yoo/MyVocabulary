@@ -20,8 +20,6 @@ public class WordlistView extends LinearLayout {
     TextView textView, textView2;
     ImageView imageView;
 
-    private ImageButton delete;
-
     public WordlistView(Context context) {
         super(context);
         init(context);
@@ -38,9 +36,6 @@ public class WordlistView extends LinearLayout {
         textView = findViewById(R.id.word);
         textView2 = findViewById(R.id.mean);
         imageView = findViewById(R.id.btn_delete);
-
-
-
     }
 
     public void setName(String word){
@@ -51,7 +46,7 @@ public class WordlistView extends LinearLayout {
         textView2.setText(mean);
     }
 
-    public void setWord(int url){
+    public void setWord(String url){
         Glide.with(this).load(url).into(imageView);
     }
 }

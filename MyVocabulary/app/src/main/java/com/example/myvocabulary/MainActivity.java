@@ -3,23 +3,41 @@ package com.example.myvocabulary;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity {
 
+    private static String TAG = "Log";
     private ImageButton add, test, exit;
+    private LinearLayout background;
     public static int state;
+    private MyAsyncTask myAsyncTask = new MyAsyncTask();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        background = findViewById(R.id.background);
+        myAsyncTask.executeTask(background); // 백그라운드 url 설정
 
         add=findViewById(R.id.btn_add);
         Glide.with(this).load("https://i.imgur.com/aZFNhx0.png").into(add);
