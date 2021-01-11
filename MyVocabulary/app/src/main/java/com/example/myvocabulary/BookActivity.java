@@ -3,11 +3,9 @@ package com.example.myvocabulary;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -15,7 +13,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,18 +34,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -78,6 +66,7 @@ public class BookActivity extends AppCompatActivity {
     private SQLiteDatabase ReadDB;
     private int count = 0;
     private int c_cnt = 0;
+    //private AlertDialog.Builder ad;
 
     private int state = MainActivity.state;
     private MyAsyncTask myAsyncTask = new MyAsyncTask();
@@ -89,7 +78,18 @@ public class BookActivity extends AppCompatActivity {
 
 
         background = findViewById(R.id.background);
-        myAsyncTask.executeTask(background);
+        //myAsyncTask.executeTask(background);
+        Glide.with(BookActivity.this).asBitmap().load("https://i.imgur.com/Ry9UfrG.png").into(new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                background.setBackground(new BitmapDrawable(getResources(), resource));
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+            }
+        });
 
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         bookDB.execSQL("CREATE TABLE IF NOT EXISTS "+tablename
@@ -252,7 +252,8 @@ public class BookActivity extends AppCompatActivity {
 
                     ad.setTitle("단어장 추가");       // 제목 설정
                     ad.setMessage("단어장 이름");   // 내용 설정
-                    ad.setIcon(R.drawable.book);
+                    ad.setIcon(R.drawable.add_baby);
+
 
                     ad.setView(et);
 
@@ -322,7 +323,7 @@ public class BookActivity extends AppCompatActivity {
         ending.setTitle("게임종료");       // 제목 설정
         ending.setMessage("모든 단어를 테스트하였습니다." +
                 "\n한번 더 하시겠습니까?");   // 내용 설정
-        ending.setIcon(R.drawable.baby);
+        ending.setIcon(R.drawable.game_baby);
 
         // 확인 버튼 설정
         ending.setPositiveButton("예", new DialogInterface.OnClickListener() {
@@ -397,7 +398,7 @@ public class BookActivity extends AppCompatActivity {
 
                 md.setTitle("단어장 수정");       // 제목 설정
                 md.setMessage("수정 할 단어장 이름을 입력하세요.");   // 내용 설정
-                md.setIcon(R.drawable.book);
+                md.setIcon(R.drawable.modify_baby);
 
                 // EditText 삽입하기
 
@@ -445,7 +446,7 @@ public class BookActivity extends AppCompatActivity {
 
                 dl.setTitle("단어장 삭제");       // 제목 설정
                 dl.setMessage("정말 삭제하시겠습니까?");   // 내용 설정
-                dl.setIcon(R.drawable.book);
+                dl.setIcon(R.drawable.delete_baby);
 
                 // 확인 버튼 설정
                 dl.setPositiveButton("확인", new DialogInterface.OnClickListener() {

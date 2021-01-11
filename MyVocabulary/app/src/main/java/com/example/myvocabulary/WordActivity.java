@@ -5,6 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -28,10 +31,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
 
@@ -58,7 +64,18 @@ public class WordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wordlist);
 
         background = findViewById(R.id.background);
-        myAsyncTask.executeTask(background); // 백그라운드 url 설정
+        //myAsyncTask.executeTask(background); // 백그라운드 url 설정
+        Glide.with(WordActivity.this).asBitmap().load("https://i.imgur.com/Ry9UfrG.png").into(new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                background.setBackground(new BitmapDrawable(getResources(), resource));
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+            }
+        });
 
         title = findViewById(R.id.title);
         title.setText(bk_name); // 단어장 이름
@@ -108,7 +125,7 @@ public class WordActivity extends AppCompatActivity {
 
                 md.setTitle("단어장 수정");       // 제목 설정
                 md.setMessage("수정 할 단어장 이름을 입력하세요.");   // 내용 설정
-                md.setIcon(R.drawable.book);
+                md.setIcon(R.drawable.modify_baby);
 
                 // EditText 삽입하기
 

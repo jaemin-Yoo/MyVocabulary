@@ -1,5 +1,7 @@
 package com.example.myvocabulary;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +41,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         background = findViewById(R.id.background);
-        myAsyncTask.executeTask(background); // 백그라운드 url 설정
+        //myAsyncTask.executeTask(background); // 백그라운드 url 설정
+        Glide.with(MainActivity.this).asBitmap().load("https://i.imgur.com/Ry9UfrG.png").into(new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                background.setBackground(new BitmapDrawable(getResources(), resource));
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+            }
+        });
 
         add=findViewById(R.id.btn_add);
         Glide.with(this).load("https://i.imgur.com/aZFNhx0.png").into(add);
