@@ -118,16 +118,18 @@ public class WordActivity extends AppCompatActivity {
                 LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
 
+                ImageView alertIcon = et.findViewById(R.id.edit_icon);
+                TextView alertTitle = et.findViewById(R.id.edit_title);
+                TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
+
                 final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
                 final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
 
+                Glide.with(getApplicationContext()).load("https://i.imgur.com/D25gEp5.png").into(alertIcon);
+                alertTitle.setText("단어장 수정");
+                alertSubTitle.setText("수정 할 단어장 이름을\n입력하세요.");
+
                 AlertDialog.Builder md = new AlertDialog.Builder(WordActivity.this);
-
-                md.setTitle("단어장 수정");       // 제목 설정
-                md.setMessage("수정 할 단어장 이름을 입력하세요.");   // 내용 설정
-                md.setIcon(R.drawable.modify_baby);
-
-                // EditText 삽입하기
 
                 md.setView(et);
                 et_name.setText(select_name);
@@ -215,6 +217,65 @@ public class WordActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 한꺼번에 단어추가
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE); // 커스텀
+                LinearLayout et_many = (LinearLayout) vi.inflate(R.layout.edit_many_box, null);
+
+                ImageView dialog_icon = et_many.findViewById(R.id.edit_many_icon);
+
+                Glide.with(getApplicationContext()).load("https://i.imgur.com/Kxz19ZG.png").into(dialog_icon);
+
+                final EditText et_word = et_many.findViewById(R.id.edit_many_word);
+
+                final AlertDialog.Builder ad = new AlertDialog.Builder(WordActivity.this);
+
+                ad.setView(et_many);
+                Log.d(TAG,"OK");
+
+                // 확인 버튼 설정
+                ad.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String total = et_word.getText().toString();
+                        Log.d(TAG,total);
+
+                        try{
+                            String[] line_break = total.split("\n");
+                            for(int i=0; i<line_break.length; i++){
+                                String[] slush = line_break[i].split("/");
+                                Log.d(TAG,line_break[i]);
+                                add_word = slush[0];
+                                add_mean = slush[1];
+
+                                if(add_word.length() != 0 && add_mean.length() != 0){
+                                    try{
+                                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"');"); // SQLite 단어 추가
+                                    } catch (Exception e){
+                                        Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(), "양식이 잘못되었습니다.",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            updateListView();
+                            dialog.dismiss();     //닫기
+                        } catch (Exception e){
+                            Toast.makeText(getApplicationContext(), "양식이 잘못되었습니다.",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                // 취소 버튼 설정
+                ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();     //닫기
+                        // Event
+                    }
+                });
+
+                ad.show();
             }
         });
     }

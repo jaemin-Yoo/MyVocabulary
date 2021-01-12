@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -242,17 +243,21 @@ public class BookActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
 
-                    LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE); // 커스텀
                     LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+
+                    ImageView alertIcon = et.findViewById(R.id.edit_icon);
+                    TextView alertTitle = et.findViewById(R.id.edit_title);
+                    TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
+
+                    Glide.with(getApplicationContext()).load("https://i.imgur.com/FSWFkXr.png").into(alertIcon);
+                    alertTitle.setText("단어장 추가");
+                    alertSubTitle.setText("단어장 이름과\n내용을 입력하세요.");
 
                     final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
                     final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
 
                     final AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
-
-                    ad.setTitle("단어장 추가");       // 제목 설정
-                    ad.setMessage("단어장 이름");   // 내용 설정
-                    ad.setIcon(R.drawable.add_baby);
 
 
                     ad.setView(et);
@@ -318,12 +323,21 @@ public class BookActivity extends AppCompatActivity {
     }
 
     private void ending(){
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LinearLayout dialog = (LinearLayout) inflater.inflate(R.layout.dialog_box, null);
+
+        ImageView dialog_icon = dialog.findViewById(R.id.dialog_icon);
+        TextView dialog_title = dialog.findViewById(R.id.dialog_title);
+        TextView dialog_subtitle = dialog.findViewById(R.id.dialog_subtitle);
+
         AlertDialog.Builder ending = new AlertDialog.Builder(BookActivity.this);
 
-        ending.setTitle("게임종료");       // 제목 설정
-        ending.setMessage("모든 단어를 테스트하였습니다." +
-                "\n한번 더 하시겠습니까?");   // 내용 설정
-        ending.setIcon(R.drawable.game_baby);
+        Glide.with(getApplicationContext()).load("https://i.imgur.com/mTzTfP9.png").into(dialog_icon);
+        dialog_title.setText("게임종료");
+        dialog_subtitle.setText("모든 단어를 테스트하였습니다.\n한번 더 하시겠습니까?");
+
+        ending.setView(dialog);
 
         // 확인 버튼 설정
         ending.setPositiveButton("예", new DialogInterface.OnClickListener() {
@@ -391,16 +405,18 @@ public class BookActivity extends AppCompatActivity {
                 LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
 
+                ImageView alertIcon = et.findViewById(R.id.edit_icon);
+                TextView alertTitle = et.findViewById(R.id.edit_title);
+                TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
+
                 final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
                 final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
 
+                Glide.with(getApplicationContext()).load("https://i.imgur.com/D25gEp5.png").into(alertIcon);
+                alertTitle.setText("단어장 수정");
+                alertSubTitle.setText("수정 할 단어장 이름을 입력하세요.");
+
                 AlertDialog.Builder md = new AlertDialog.Builder(BookActivity.this);
-
-                md.setTitle("단어장 수정");       // 제목 설정
-                md.setMessage("수정 할 단어장 이름을 입력하세요.");   // 내용 설정
-                md.setIcon(R.drawable.modify_baby);
-
-                // EditText 삽입하기
 
                 md.setView(et);
                 et_name.setText(select_name);
@@ -442,11 +458,21 @@ public class BookActivity extends AppCompatActivity {
                 return true;
 
             case R.id.delete:
+
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout dialog = (LinearLayout) inflater.inflate(R.layout.dialog_box, null);
+
+                ImageView dialog_icon = dialog.findViewById(R.id.dialog_icon);
+                TextView dialog_title = dialog.findViewById(R.id.dialog_title);
+                TextView dialog_subtitle = dialog.findViewById(R.id.dialog_subtitle);
+
                 AlertDialog.Builder dl = new AlertDialog.Builder(BookActivity.this);
 
-                dl.setTitle("단어장 삭제");       // 제목 설정
-                dl.setMessage("정말 삭제하시겠습니까?");   // 내용 설정
-                dl.setIcon(R.drawable.delete_baby);
+                Glide.with(getApplicationContext()).load("https://i.imgur.com/1tJF5TG.png").into(dialog_icon);
+                dialog_title.setText("단어장 삭제");
+                dialog_subtitle.setText("정말 삭제하시겠습니까?");
+
+                dl.setView(dialog);
 
                 // 확인 버튼 설정
                 dl.setPositiveButton("확인", new DialogInterface.OnClickListener() {
