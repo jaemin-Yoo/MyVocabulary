@@ -192,7 +192,7 @@ public class WordActivity extends AppCompatActivity {
 
                 if(add_word.length() != 0 && add_mean.length() != 0){
                     try{
-                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"');"); // SQLite 단어 추가
+                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
                         updateListView();
                         et_word.setText(""); // 추가 후 EditText 공백처리
                         et_mean.setText("");
@@ -288,24 +288,43 @@ public class WordActivity extends AppCompatActivity {
     public void updateListView(){
         WordAdapter adapter = new WordAdapter();
 
-        SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
-        Cursor c = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
+        try{
+            Cursor c = bookDB.rawQuery("SELECT * FROM "+bk_name, null);
 
-        count = findViewById(R.id.wl_count);
-        count.setText(c.getCount()+"개");
+            count = findViewById(R.id.wl_count);
+            count.setText(c.getCount()+"개");
 
-        if(c!=null && c.getCount() != 0){
-            if(c.moveToFirst()){
-                do{
-                    String Name = c.getString(c.getColumnIndex("word"));
-                    String Subname = c.getString(c.getColumnIndex("mean"));
-                    adapter.addItem(new Wordlist(Name, Subname, "https://i.imgur.com/R4p7yBK.png","https://i.imgur.com/5sZaSCh.png"));
-                    listView.setAdapter(adapter);
-                } while (c.moveToNext());
+            if(c!=null && c.getCount() != 0){
+                if(c.moveToFirst()){
+                    do{
+                        String Name = c.getString(c.getColumnIndex("word"));
+                        String Subname = c.getString(c.getColumnIndex("mean"));
+                        int Priority = c.getInt(c.getColumnIndex("pri"));
+                        String pri_url = new String();
+                        switch (Priority){
+                            case 1:
+                                pri_url = "https://i.imgur.com/NubkZ4l.png";
+                                break;
+                            case 2:
+                                pri_url = "https://i.imgur.com/RjwsANg.png";
+                                break;
+                            case 3:
+                                pri_url = "https://i.imgur.com/KzZMZ7n.png";
+                                break;
+                            default: // 우선순위 0 또는 음수
+                                pri_url = "https://i.imgur.com/5sZaSCh.png";
+                                break;
+                        }
+                        adapter.addItem(new Wordlist(Name, Subname, "https://i.imgur.com/R4p7yBK.png",pri_url));
+                        listView.setAdapter(adapter);
+                    } while (c.moveToNext());
+                }
             }
-        }
-        else{
-            listView.setAdapter(null); // 저장된 데이터가 없을 때, 공백으로 listview 업데이트
+            else{
+                listView.setAdapter(null); // 저장된 데이터가 없을 때, 공백으로 listview 업데이트
+            }
+        } catch (Exception e){
+            Toast.makeText(getApplicationContext(), "SELECT ERROR", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -348,17 +367,16 @@ public class WordActivity extends AppCompatActivity {
             wordlistView.setImageView(item.getUrl());
             wordlistView.setImageView2(item.getUrl2());
 
-            final String delete_word = item.getName();
+            final String select_word = item.getName();
 
             delete = wordlistView.findViewById(R.id.btn_delete);
             delete.setFocusable(false); // 리스트뷰와 리스트뷰 내 아이템 둘 다 클릭 가능하도록 설정
-
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d(TAG,"삭제한 단어:"+delete_word);
+                    Log.d(TAG,"삭제한 단어:"+select_word);
                     try{
-                        bookDB.execSQL("DELETE FROM "+bk_name+" WHERE word='"+delete_word+"';"); // 단어 삭제
+                        bookDB.execSQL("DELETE FROM "+bk_name+" WHERE word='"+select_word+"';"); // 단어 삭제
                         updateListView();
                         Toast.makeText(getApplicationContext(),"삭제되었습니다.",Toast.LENGTH_SHORT).show();
                     } catch (Exception e){
@@ -369,14 +387,37 @@ public class WordActivity extends AppCompatActivity {
 
             priority = wordlistView.findViewById(R.id.btn_priority);
             priority.setFocusable(false);
-
             priority.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // 우선순위 클릭 시
-                    //https://i.imgur.com/NubkZ4l.png 1
-                    //https://i.imgur.com/RjwsANg.png 2
-                    //https://i.imgur.com/KzZMZ7n.png 3
+                    Cursor c = bookDB.rawQuery("SELECT pri FROM "+bk_name+" WHERE word='"+select_word+"';", null);
+                    int pri_cnt = 0;
+                    if(c.moveToFirst()){
+                        do{
+                            pri_cnt = c.getInt(c.getColumnIndex("pri"));
+                        } while (c.moveToNext());
+                    }
+
+                    switch (pri_cnt){
+                        case 1:
+                            Glide.with(getApplicationContext()).load("https://i.imgur.com/RjwsANg.png").into(priority);
+                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=2 WHERE word='"+select_word+"';");
+                            break;
+                        case 2:
+                            Glide.with(getApplicationContext()).load("https://i.imgur.com/KzZMZ7n.png").into(priority);
+                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=3 WHERE word='"+select_word+"';");
+                            break;
+                        case 3:
+                            Glide.with(getApplicationContext()).load("https://i.imgur.com/5sZaSCh.png").into(priority);
+                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=0 WHERE word='"+select_word+"';");
+                            break;
+                        default: // 우선순위 0 또는 음수
+                            Glide.with(getApplicationContext()).load("https://i.imgur.com/NubkZ4l.png").into(priority);
+                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=1 WHERE word='"+select_word+"';");
+                            break;
+                    }
+                    updateListView();
                 }
             });
 

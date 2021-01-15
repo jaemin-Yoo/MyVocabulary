@@ -41,7 +41,7 @@
             android:id="@+id/btn_priority"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:background="#00FF0000"/>
 
         <ImageButton

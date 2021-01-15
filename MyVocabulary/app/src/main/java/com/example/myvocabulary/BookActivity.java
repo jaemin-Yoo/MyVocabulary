@@ -64,7 +64,6 @@ public class BookActivity extends AppCompatActivity {
     private ListView listView;
     private Booklist bl;
     public static String bk_name;
-    private SQLiteDatabase ReadDB;
     private int count = 0;
     private int c_cnt = 0;
     //private AlertDialog.Builder ad;
@@ -95,8 +94,6 @@ public class BookActivity extends AppCompatActivity {
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         bookDB.execSQL("CREATE TABLE IF NOT EXISTS "+tablename
                 +" (name VARCHAR(10) PRIMARY KEY, subname VARCHAR(20));");
-
-        ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
 
         back=findViewById(R.id.btn_back);
         Glide.with(this).load("https://i.imgur.com/iYM8Gc1.png").into(back); // 이미지 로드
@@ -144,6 +141,10 @@ public class BookActivity extends AppCompatActivity {
         touch_blank = findViewById(R.id.touch_blank);
         Glide.with(this).load("https://i.imgur.com/7WKlNlK.png").into(touch_blank);
 
+        game_word = findViewById(R.id.game_word);
+        game_mean = findViewById(R.id.game_mean);
+        gm_count = findViewById(R.id.gm_count);
+
         incorrect = findViewById(R.id.incorrect);
         Glide.with(this).load("https://i.imgur.com/0kbTDA9.png").into(incorrect);
         incorrect.setOnClickListener(new View.OnClickListener() {
@@ -151,11 +152,12 @@ public class BookActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 틀렸어요, 다음 단어, 우선순위 증가
                 if (count!=c_cnt){
-                    nextWord();
+                    nextWord(); // 다음 단어
                 } else{
-                    ending();
+                    ending(); // 끝
                 }
-                Log.d(TAG,count+" (count)");
+                String str = String.valueOf(game_word.getText());
+                bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=pri+1 WHERE word='"+str+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
             }
         });
 
@@ -170,17 +172,12 @@ public class BookActivity extends AppCompatActivity {
                 } else{
                     ending();
                 }
-                Log.d(TAG,count+" (count)");
             }
         });
 
         game_layout = findViewById(R.id.game_layout);
         touch_layout = findViewById(R.id.touch_layout);
         game_layout.setVisibility(View.INVISIBLE);
-
-        game_word = findViewById(R.id.game_word);
-        game_mean = findViewById(R.id.game_mean);
-        gm_count = findViewById(R.id.gm_count);
 
         listView = findViewById(R.id.book_list);
         BookAdapter adapter = new BookAdapter();
@@ -198,34 +195,38 @@ public class BookActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else {
                     // 게임시작
-                    Cursor cursor = ReadDB.rawQuery("SELECT * FROM "+bk_name, null);
-                    c_cnt = cursor.getCount();
+                    try{
+                        Cursor cursor = bookDB.rawQuery("SELECT * FROM "+bk_name, null);
+                        c_cnt = cursor.getCount();
 
-                    if (c_cnt != 0){
-                        game_layout.setVisibility(View.VISIBLE);
-                        disableEnableControls(false, (ViewGroup)findViewById(R.id.book_layout));
+                        if (c_cnt != 0){
+                            game_layout.setVisibility(View.VISIBLE);
+                            disableEnableControls(false, (ViewGroup)findViewById(R.id.book_layout));
 
-                        // 단어 select
-                        Log.d(TAG,c_cnt+" (c_cnt)");
-                        wd_arr = new String[c_cnt];
-                        mn_arr = new String[c_cnt];
+                            // 단어 select
+                            Log.d(TAG,c_cnt+" (c_cnt)");
+                            wd_arr = new String[c_cnt];
+                            mn_arr = new String[c_cnt];
 
-                        int j = 0;
-                        if(cursor!=null){
-                            if(cursor.moveToFirst()){
-                                do{
-                                    wd_arr[j] = cursor.getString(cursor.getColumnIndex("word"));
-                                    mn_arr[j] = cursor.getString(cursor.getColumnIndex("mean"));
-                                    j++;
-                                } while (cursor.moveToNext());
+                            int j = 0;
+                            if(cursor!=null){
+                                if(cursor.moveToFirst()){
+                                    do{
+                                        wd_arr[j] = cursor.getString(cursor.getColumnIndex("word"));
+                                        mn_arr[j] = cursor.getString(cursor.getColumnIndex("mean"));
+                                        j++;
+                                    } while (cursor.moveToNext());
+                                }
                             }
-                        }
-                        randomNumber();
-                        nextWord();
+                            randomNumber();
+                            nextWord();
 
-                        Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
-                    } else{
-                        Toast.makeText(getApplicationContext(),"최소 1개 이상의 단어를 등록하세요.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
+                        } else{
+                            Toast.makeText(getApplicationContext(),"최소 1개 이상의 단어를 등록하세요.", Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e){
+                        Toast.makeText(getApplicationContext(), "SELECT ERROR", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -273,7 +274,7 @@ public class BookActivity extends AppCompatActivity {
                             if (add_name.length() != 0 && add_subname.length() != 0){
                                 try{
                                     bookDB.execSQL("CREATE TABLE "+add_name
-                                            +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20));");
+                                            +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20), pri INT DEFAULT 0);");
                                     bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
                                     updateListView();
                                     dialog.dismiss();     //닫기
@@ -511,8 +512,7 @@ public class BookActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.book_list);
         BookAdapter adapter = new BookAdapter();
 
-        SQLiteDatabase ReadDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
-        Cursor c = ReadDB.rawQuery("SELECT * FROM "+tablename, null);
+        Cursor c = bookDB.rawQuery("SELECT * FROM "+tablename, null);
 
         if(c!=null && c.getCount() != 0){
             if(c.moveToFirst()){
