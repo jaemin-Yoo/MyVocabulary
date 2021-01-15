@@ -38,6 +38,13 @@
             android:layout_weight="1"/>
 
         <ImageButton
+            android:id="@+id/btn_priority"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:background="#00FF0000"/>
+
+        <ImageButton
             android:id="@+id/btn_delete"
             android:padding="5dp"
             android:layout_width="30dp"

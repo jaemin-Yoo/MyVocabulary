@@ -414,7 +414,7 @@ public class BookActivity extends AppCompatActivity {
 
                 Glide.with(getApplicationContext()).load("https://i.imgur.com/D25gEp5.png").into(alertIcon);
                 alertTitle.setText("단어장 수정");
-                alertSubTitle.setText("수정 할 단어장 이름을 입력하세요.");
+                alertSubTitle.setText("수정 할 단어장 이름을\n입력하세요.");
 
                 AlertDialog.Builder md = new AlertDialog.Builder(BookActivity.this);
 

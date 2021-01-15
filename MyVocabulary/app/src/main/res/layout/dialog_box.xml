@@ -28,8 +28,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:textSize="40dp"
-                android:textStyle="bold"
-                android:textColor="#000"/>
+                android:textColor="#000"
+                android:fontFamily="@font/scdream9"/>
 
             <TextView
                 android:id="@+id/dialog_subtitle"
@@ -37,7 +37,8 @@
                 android:layout_height="match_parent"
                 android:paddingLeft="10dp"
                 android:textSize="15dp"
-                android:textColor="#000"/>
+                android:textColor="#000"
+                android:fontFamily="@font/scdream5"/>
 
         </LinearLayout>
     </LinearLayout>

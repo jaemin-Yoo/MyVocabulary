@@ -44,7 +44,7 @@ import java.util.ArrayList;
 public class WordActivity extends AppCompatActivity {
 
     public String TAG = "Log";
-    private ImageButton back, home, register, delete, many_word;
+    private ImageButton back, home, register, delete, many_word, priority;
     private ImageView word, mean;
     private TextView title, count;
     private String bk_name = BookActivity.bk_name;
@@ -241,7 +241,8 @@ public class WordActivity extends AppCompatActivity {
 
                         try{
                             String[] line_break = total.split("\n");
-                            for(int i=0; i<line_break.length; i++){
+                            int word_cnt = line_break.length;
+                            for(int i=0; i<word_cnt; i++){
                                 String[] slush = line_break[i].split("/");
                                 Log.d(TAG,line_break[i]);
                                 add_word = slush[0];
@@ -250,12 +251,15 @@ public class WordActivity extends AppCompatActivity {
                                 if(add_word.length() != 0 && add_mean.length() != 0){
                                     try{
                                         bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"');"); // SQLite 단어 추가
+                                        Toast.makeText(getApplicationContext(),word_cnt+"개의 단어가 추가되었습니다.",Toast.LENGTH_SHORT).show();
                                     } catch (Exception e){
                                         Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
+                                        break;
                                     }
                                 }
                                 else{
                                     Toast.makeText(getApplicationContext(), "양식이 잘못되었습니다.",Toast.LENGTH_SHORT).show();
+                                    break;
                                 }
                             }
                             updateListView();
@@ -295,7 +299,7 @@ public class WordActivity extends AppCompatActivity {
                 do{
                     String Name = c.getString(c.getColumnIndex("word"));
                     String Subname = c.getString(c.getColumnIndex("mean"));
-                    adapter.addItem(new Wordlist(Name, Subname, "https://i.imgur.com/R4p7yBK.png"));
+                    adapter.addItem(new Wordlist(Name, Subname, "https://i.imgur.com/R4p7yBK.png","https://i.imgur.com/5sZaSCh.png"));
                     listView.setAdapter(adapter);
                 } while (c.moveToNext());
             }
@@ -341,7 +345,8 @@ public class WordActivity extends AppCompatActivity {
             Wordlist item = items.get(i);
             wordlistView.setName(item.getName());
             wordlistView.setSubname(item.getSubname());
-            wordlistView.setWord(item.getUrl());
+            wordlistView.setImageView(item.getUrl());
+            wordlistView.setImageView2(item.getUrl2());
 
             final String delete_word = item.getName();
 
@@ -361,6 +366,21 @@ public class WordActivity extends AppCompatActivity {
                     }
                 }
             });
+
+            priority = wordlistView.findViewById(R.id.btn_priority);
+            priority.setFocusable(false);
+
+            priority.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // 우선순위 클릭 시
+                    //https://i.imgur.com/NubkZ4l.png 1
+                    //https://i.imgur.com/RjwsANg.png 2
+                    //https://i.imgur.com/KzZMZ7n.png 3
+                }
+            });
+
+
 
             return wordlistView;
         }

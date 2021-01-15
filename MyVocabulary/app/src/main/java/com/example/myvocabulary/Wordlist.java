@@ -4,11 +4,13 @@ public class Wordlist {
     String name;
     String subname;
     String Url;
+    String Url2;
 
-    public Wordlist(String name, String subname, String Url){
+    public Wordlist(String name, String subname, String Url, String Url2){
         this.name = name;
         this.subname = subname;
         this.Url = Url;
+        this.Url2 = Url2;
     }
 
     public String getName() {
@@ -31,12 +33,17 @@ public class Wordlist {
         return Url;
     }
 
+    public String getUrl2() {
+        return Url2;
+    }
+
     @Override
     public String toString() {
         return "Wordlist{" +
                 "name='" + name + '\'' +
                 ", subname='" + subname + '\'' +
                 ", Url=" + Url +
+                ", Url2=" + Url2 +
                 '}';
     }
 }

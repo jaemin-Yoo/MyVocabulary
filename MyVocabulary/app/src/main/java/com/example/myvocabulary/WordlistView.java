@@ -18,7 +18,7 @@ import com.bumptech.glide.Glide;
 public class WordlistView extends LinearLayout {
 
     TextView textView, textView2;
-    ImageView imageView;
+    ImageView imageView, imageView2;
 
     public WordlistView(Context context) {
         super(context);
@@ -36,6 +36,7 @@ public class WordlistView extends LinearLayout {
         textView = findViewById(R.id.word);
         textView2 = findViewById(R.id.mean);
         imageView = findViewById(R.id.btn_delete);
+        imageView2 = findViewById(R.id.btn_priority);
     }
 
     public void setName(String word){
@@ -46,7 +47,11 @@ public class WordlistView extends LinearLayout {
         textView2.setText(mean);
     }
 
-    public void setWord(String url){
+    public void setImageView(String url){
         Glide.with(this).load(url).into(imageView);
+    }
+
+    public void setImageView2(String url){
+        Glide.with(this).load(url).into(imageView2);
     }
 }
