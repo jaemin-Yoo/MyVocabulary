@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingHorizontal="5dp">
 
         <TextView
             android:id="@+id/word"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:textSize="20dp"
             android:textColor="#000"
             android:textStyle="bold"
@@ -26,16 +26,13 @@
 
         <TextView
             android:id="@+id/mean"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:textSize="20dp"
             android:textColor="#000"
             android:maxLines="1"
             android:ellipsize="end"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
 
         <ImageButton
             android:id="@+id/btn_priority"
@@ -49,7 +46,6 @@
             android:padding="5dp"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_gravity="right"
             android:scaleType="centerCrop"
             android:background="#00FF0000"/>
 

@@ -45,50 +45,64 @@
             android:background="#00FF0000"
             android:scaleType="centerCrop"/>
 
-        <ImageView
-            android:id="@+id/word_text"
-            android:layout_width="130dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="120dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:layout_marginTop="120dp">
 
-        <EditText
-            android:id="@+id/edit_word"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="45dp"
-            android:layout_marginTop="140dp"
-            android:gravity="center"
-            android:hint="단어"
-            android:singleLine="true"
-            android:maxLength="16"/>
+            <ImageView
+                android:id="@+id/word_text"
+                android:layout_width="130dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"/>
 
-        <ImageView
-            android:id="@+id/mean_text"
-            android:layout_width="130dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="170dp"
-            android:layout_marginTop="120dp"/>
+            <ImageView
+                android:id="@+id/mean_text"
+                android:layout_width="130dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"/>
 
-        <EditText
-            android:id="@+id/edit_mean"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="185dp"
-            android:layout_marginTop="140dp"
-            android:gravity="center"
-            android:hint="뜻"
-            android:singleLine="true"
-            android:maxLength="27"/>
+            <ImageButton
+                android:id="@+id/btn_register"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:background="#00FF0000"
+                android:scaleType="fitCenter"/>
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/btn_register"
-            android:layout_width="70dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="310dp"
-            android:layout_marginTop="125dp"
-            android:background="#00FF0000"
-            android:scaleType="fitCenter"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="120dp"
+            android:padding="20dp">
+
+            <EditText
+                android:id="@+id/edit_word"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:hint="단어"
+                android:singleLine="true"
+                android:maxLength="16"/>
+
+            <EditText
+                android:id="@+id/edit_mean"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:hint="뜻"
+                android:singleLine="true"
+                android:maxLength="27"/>
+
+            <View
+                android:layout_width="70dp"
+                android:layout_height="40dp"/>
+        </LinearLayout>
 
         <ListView
             android:id="@+id/word_list"

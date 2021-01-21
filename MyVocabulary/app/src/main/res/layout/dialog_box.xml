@@ -27,14 +27,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:textSize="40dp"
+                android:textSize="30sp"
                 android:textColor="#000"
                 android:fontFamily="@font/scdream9"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
 
             <TextView
                 android:id="@+id/dialog_subtitle"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
                 android:textSize="15dp"
                 android:textColor="#000"

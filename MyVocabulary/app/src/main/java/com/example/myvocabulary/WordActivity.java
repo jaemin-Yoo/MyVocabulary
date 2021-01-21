@@ -250,7 +250,7 @@ public class WordActivity extends AppCompatActivity {
 
                                 if(add_word.length() != 0 && add_mean.length() != 0){
                                     try{
-                                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"');"); // SQLite 단어 추가
+                                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
                                         Toast.makeText(getApplicationContext(),word_cnt+"개의 단어가 추가되었습니다.",Toast.LENGTH_SHORT).show();
                                     } catch (Exception e){
                                         Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
