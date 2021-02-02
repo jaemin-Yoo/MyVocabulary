@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 state = 1;
                 Log.d("click", "Test");
-                Intent intent = new Intent(MainActivity.this, BookActivity.class);
+                Intent intent = new Intent(MainActivity.this, TestActivity.class);
                 startActivity(intent);
             }
         });

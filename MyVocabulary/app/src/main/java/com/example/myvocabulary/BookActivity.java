@@ -69,6 +69,7 @@ public class BookActivity extends AppCompatActivity {
     //private AlertDialog.Builder ad;
 
     private int state = MainActivity.state;
+    private int test_state = TestActivity.test_state;
     private MyAsyncTask myAsyncTask = new MyAsyncTask();
 
     @Override
@@ -115,6 +116,93 @@ public class BookActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        state_text = findViewById(R.id.state_text);
+        if (state == 0){
+            state_text.setText("단어추가");
+            state_text.setTextColor(Color.parseColor("#8EBB65"));
+
+            add=findViewById(R.id.add_book);
+            Glide.with(this).load("https://i.imgur.com/6tbIs0H.png").into(add);
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE); // 커스텀
+                    LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+
+                    ImageView alertIcon = et.findViewById(R.id.edit_icon);
+                    TextView alertTitle = et.findViewById(R.id.edit_title);
+                    TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
+
+                    Glide.with(getApplicationContext()).load("https://i.imgur.com/FSWFkXr.png").into(alertIcon);
+                    alertTitle.setText("단어장 추가");
+                    alertSubTitle.setText("단어장 이름과\n내용을 입력하세요.");
+
+                    final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
+                    final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
+
+                    final AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
+
+
+                    ad.setView(et);
+
+                    // 확인 버튼 설정
+                    ad.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            // Text 값 받아서 로그 남기기
+                            add_name = et_name.getText().toString();
+                            add_subname = et_subname.getText().toString();
+                            if (add_name.length() != 0 && add_subname.length() != 0){
+                                try{
+                                    bookDB.execSQL("CREATE TABLE "+add_name
+                                            +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20), pri INT DEFAULT 0);");
+                                    bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
+                                    updateListView();
+                                    dialog.dismiss();     //닫기
+                                } catch (Exception e){
+                                    Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"빈칸을 채우세요.",Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+                    // 취소 버튼 설정
+                    ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();     //닫기
+                            // Event
+                        }
+                    });
+
+                    ad.show();
+                }
+            });
+        }
+        else{
+            switch(test_state){
+                case 0:
+                    state_text.setText("전체단어 테스트");
+                    state_text.setTextColor(Color.parseColor("#AA00AA"));
+                    break;
+                case 1:
+                    state_text.setText("못 외운 단어 테스트");
+                    state_text.setTextColor(Color.parseColor("#FF1E90FF"));
+                    break;
+                case 2:
+                    state_text.setText("다 외운 단어 테스트");
+                    state_text.setTextColor(Color.parseColor("#DD0000"));
+                    break;
+            }
+        }
+
+        updateListView();
 
         game_exit = findViewById(R.id.game_exit);
         Glide.with(this).load("https://i.imgur.com/BESADN8.png").into(game_exit);
@@ -198,7 +286,19 @@ public class BookActivity extends AppCompatActivity {
                 } else {
                     // 게임시작
                     try{
-                        Cursor cursor = bookDB.rawQuery("SELECT * FROM "+bk_name, null);
+                        String str="";
+                        switch(test_state){
+                            case 0:
+                                str="";
+                                break;
+                            case 1:
+                                str=" ORDER BY pri DESC LIMIT 50";
+                                break;
+                            case 2:
+                                str=" WHERE pri=-3";
+                                break;
+                        }
+                        Cursor cursor = bookDB.rawQuery("SELECT * FROM "+bk_name+str, null);
                         c_cnt = cursor.getCount();
 
                         if (c_cnt != 0){
@@ -225,7 +325,11 @@ public class BookActivity extends AppCompatActivity {
 
                             Toast.makeText(getApplicationContext(),bk_name, Toast.LENGTH_SHORT).show();
                         } else{
-                            Toast.makeText(getApplicationContext(),"최소 1개 이상의 단어를 등록하세요.", Toast.LENGTH_LONG).show();
+                            if(test_state==2){
+                                Toast.makeText(getApplicationContext(),"다 외운 단어가 존재하지 않습니다.\n테스트를 더 진행하세요.", Toast.LENGTH_LONG).show();
+                            } else{
+                                Toast.makeText(getApplicationContext(),"최소 1개 이상의 단어를 등록하세요.", Toast.LENGTH_LONG).show();
+                            }
                         }
                     } catch (Exception e){
                         Toast.makeText(getApplicationContext(), "SELECT ERROR", Toast.LENGTH_LONG).show();
@@ -233,82 +337,6 @@ public class BookActivity extends AppCompatActivity {
                 }
             }
         });
-
-        state_text = findViewById(R.id.state_text);
-
-        if (state == 0){
-            state_text.setText("단어추가");
-            state_text.setTextColor(Color.parseColor("#8EBB65"));
-
-            add=findViewById(R.id.add_book);
-            Glide.with(this).load("https://i.imgur.com/6tbIs0H.png").into(add);
-            add.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE); // 커스텀
-                    LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
-
-                    ImageView alertIcon = et.findViewById(R.id.edit_icon);
-                    TextView alertTitle = et.findViewById(R.id.edit_title);
-                    TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
-
-                    Glide.with(getApplicationContext()).load("https://i.imgur.com/FSWFkXr.png").into(alertIcon);
-                    alertTitle.setText("단어장 추가");
-                    alertSubTitle.setText("단어장 이름과\n내용을 입력하세요.");
-
-                    final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
-                    final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
-
-                    final AlertDialog.Builder ad = new AlertDialog.Builder(BookActivity.this);
-
-
-                    ad.setView(et);
-
-                    // 확인 버튼 설정
-                    ad.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            // Text 값 받아서 로그 남기기
-                            add_name = et_name.getText().toString();
-                            add_subname = et_subname.getText().toString();
-                            if (add_name.length() != 0 && add_subname.length() != 0){
-                                try{
-                                    bookDB.execSQL("CREATE TABLE "+add_name
-                                            +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20), pri INT DEFAULT 0);");
-                                    bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
-                                    updateListView();
-                                    dialog.dismiss();     //닫기
-                                } catch (Exception e){
-                                    Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
-                                }
-                            }
-                            else{
-                                Toast.makeText(getApplicationContext(),"빈칸을 채우세요.",Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-
-                    // 취소 버튼 설정
-                    ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();     //닫기
-                            // Event
-                        }
-                    });
-
-                    ad.show();
-                }
-            });
-        }
-        else{
-            state_text.setText("게임시작");
-            state_text.setTextColor(Color.parseColor("#489DD8"));
-        }
-
-        updateListView();
     }
 
     private void randomNumber(){
