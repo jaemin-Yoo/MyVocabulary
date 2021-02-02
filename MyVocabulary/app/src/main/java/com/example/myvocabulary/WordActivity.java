@@ -44,7 +44,7 @@ import java.util.ArrayList;
 public class WordActivity extends AppCompatActivity {
 
     public String TAG = "Log";
-    private ImageButton back, home, register, delete, many_word, priority;
+    private ImageButton back, home, register, delete, many_word, priority, sort;
     private ImageView word, mean;
     private TextView title, count;
     private String bk_name = BookActivity.bk_name;
@@ -53,6 +53,7 @@ public class WordActivity extends AppCompatActivity {
     private LinearLayout background;
     private Wordlist wl;
     private String select_name, select_subname, modify_name, modify_subname;
+    private int sort_state = 0;
 
     private MyAsyncTask myAsyncTask = new MyAsyncTask();
     SQLiteDatabase bookDB = null;
@@ -111,62 +112,7 @@ public class WordActivity extends AppCompatActivity {
                 wl = (Wordlist) listView.getAdapter().getItem(i);
                 select_name = wl.getName();
                 select_subname = wl.getSubname();
-
-                Toast.makeText(getApplicationContext(),select_name, Toast.LENGTH_SHORT).show();
-                Log.d(TAG,select_name);
-
-                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
-
-                ImageView alertIcon = et.findViewById(R.id.edit_icon);
-                TextView alertTitle = et.findViewById(R.id.edit_title);
-                TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
-
-                final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
-                final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
-
-                Glide.with(getApplicationContext()).load("https://i.imgur.com/D25gEp5.png").into(alertIcon);
-                alertTitle.setText("단어장 수정");
-                alertSubTitle.setText("수정 할 단어장 이름을\n입력하세요.");
-
-                AlertDialog.Builder md = new AlertDialog.Builder(WordActivity.this);
-
-                md.setView(et);
-                et_name.setText(select_name);
-                et_subname.setText(select_subname);
-
-
-                // 확인 버튼 설정
-                md.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        // Text 값 받아서 로그 남기기
-                        modify_name = et_name.getText().toString();
-                        modify_subname = et_subname.getText().toString();
-
-                        try{
-                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" word='"+modify_name+"', mean='"+modify_subname+"' WHERE word='"+select_name+"';");
-                            updateListView();
-                            dialog.dismiss();     //닫기
-                            Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
-                        } catch(Exception e){
-                            Toast.makeText(getApplicationContext(),"에러:동일한 단어가 존재합니다.",Toast.LENGTH_LONG).show();
-                        }
-
-                    }
-                });
-
-                // 취소 버튼 설정
-                md.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();     //닫기
-                        // Event
-                    }
-                });
-
-                md.show();
+                modifyFunction();
             }
         });
 
@@ -193,15 +139,27 @@ public class WordActivity extends AppCompatActivity {
                 if(add_word.length() != 0 && add_mean.length() != 0){
                     try{
                         bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
-                        updateListView();
-                        et_word.setText(""); // 추가 후 EditText 공백처리
-                        et_mean.setText("");
-                        et_word.requestFocus();
-                        et_word.setCursorVisible(true);
+                        updateListView(sort_state);
                         Log.d(TAG, "추가한 단어:"+add_word);
                     } catch (Exception e){
                         Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
+
+                        Cursor cursor = bookDB.rawQuery("SELECT * FROM "+bk_name+" WHERE word='"+add_word+"'",null);
+
+                        if(cursor!=null){
+                            if(cursor.moveToFirst()){
+                                do{
+                                    select_name = cursor.getString(cursor.getColumnIndex("word"));
+                                    select_subname = cursor.getString(cursor.getColumnIndex("mean"));
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        modifyFunction();
                     }
+                    et_word.setText(""); // 추가 후 EditText 공백처리
+                    et_mean.setText("");
+                    et_word.requestFocus();
+                    et_word.setCursorVisible(true);
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "빈칸을 채우세요.",Toast.LENGTH_SHORT).show();
@@ -209,7 +167,35 @@ public class WordActivity extends AppCompatActivity {
             }
         });
 
-        updateListView();
+        // a : "https://i.imgur.com/OzrIkQq.png"
+        // z : https://i.imgur.com/LGwcFGr.png
+        // sort : https://i.imgur.com/xVbYlTz.png
+
+        sort = findViewById(R.id.btn_sort);
+        Glide.with(this).load("https://i.imgur.com/xVbYlTz.png").into(sort);
+        sort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch(sort_state){
+                    case 0:
+                        Glide.with(getApplicationContext()).load("https://i.imgur.com/OzrIkQq.png").into(sort); // a 정렬
+                        sort_state = 1;
+                        break;
+                    case 1:
+                        Glide.with(getApplicationContext()).load("https://i.imgur.com/LGwcFGr.png").into(sort); // z 정렬
+                        sort_state = 2;
+
+                        break;
+                    case 2:
+                        Glide.with(getApplicationContext()).load("https://i.imgur.com/xVbYlTz.png").into(sort); // 기본 정렬
+                        sort_state = 0;
+                        break;
+                }
+                updateListView(sort_state);
+            }
+        });
+
+        updateListView(sort_state);
 
         many_word = findViewById(R.id.add_many);
         Glide.with(this).load("https://i.imgur.com/oBWlKev.png").into(many_word);
@@ -242,6 +228,7 @@ public class WordActivity extends AppCompatActivity {
                         try{
                             String[] line_break = total.split("\n");
                             int word_cnt = line_break.length;
+                            int state = 0;
                             for(int i=0; i<word_cnt; i++){
                                 String[] slush = line_break[i].split("/");
                                 Log.d(TAG,line_break[i]);
@@ -251,7 +238,7 @@ public class WordActivity extends AppCompatActivity {
                                 if(add_word.length() != 0 && add_mean.length() != 0){
                                     try{
                                         bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
-                                        Toast.makeText(getApplicationContext(),word_cnt+"개의 단어가 추가되었습니다.",Toast.LENGTH_SHORT).show();
+                                        state++;
                                     } catch (Exception e){
                                         Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
                                         break;
@@ -262,7 +249,11 @@ public class WordActivity extends AppCompatActivity {
                                     break;
                                 }
                             }
-                            updateListView();
+
+                            if(state > 0){
+                                Toast.makeText(getApplicationContext(),state+"개의 단어가 추가되었습니다.",Toast.LENGTH_SHORT).show();
+                            }
+                            updateListView(sort_state);
                             dialog.dismiss();     //닫기
                         } catch (Exception e){
                             Toast.makeText(getApplicationContext(), "양식이 잘못되었습니다.",Toast.LENGTH_SHORT).show();
@@ -284,12 +275,84 @@ public class WordActivity extends AppCompatActivity {
         });
     }
 
+    public void modifyFunction(){
 
-    public void updateListView(){
+        Toast.makeText(getApplicationContext(),select_name, Toast.LENGTH_SHORT).show();
+        Log.d(TAG,select_name);
+
+        LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LinearLayout et = (LinearLayout) vi.inflate(R.layout.edit_box, null);
+
+        ImageView alertIcon = et.findViewById(R.id.edit_icon);
+        TextView alertTitle = et.findViewById(R.id.edit_title);
+        TextView alertSubTitle = et.findViewById(R.id.edit_subtitle);
+
+        final EditText et_name = (EditText)et.findViewById(R.id.edit_name);
+        final EditText et_subname = (EditText)et.findViewById(R.id.edit_subname);
+
+        Glide.with(getApplicationContext()).load("https://i.imgur.com/D25gEp5.png").into(alertIcon);
+        alertTitle.setText("단어장 수정");
+        alertSubTitle.setText("수정 할 단어장 이름을\n입력하세요.");
+
+        AlertDialog.Builder md = new AlertDialog.Builder(WordActivity.this);
+
+        md.setView(et);
+        et_name.setText(select_name);
+        et_subname.setText(select_subname);
+
+
+        // 확인 버튼 설정
+        md.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Text 값 받아서 로그 남기기
+                modify_name = et_name.getText().toString();
+                modify_subname = et_subname.getText().toString();
+
+                try{
+                    bookDB.execSQL("UPDATE "+bk_name+" SET"+" word='"+modify_name+"', mean='"+modify_subname+"' WHERE word='"+select_name+"';");
+                    updateListView(sort_state);
+                    dialog.dismiss();     //닫기
+                    Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
+                } catch(Exception e){
+                    Toast.makeText(getApplicationContext(),"에러:동일한 단어가 존재합니다.",Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+        // 취소 버튼 설정
+        md.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();     //닫기
+                // Event
+            }
+        });
+
+        md.show();
+    }
+
+    public void updateListView(int sort_state){
         WordAdapter adapter = new WordAdapter();
 
+        String str="";
+
         try{
-            Cursor c = bookDB.rawQuery("SELECT * FROM "+bk_name, null);
+            switch(sort_state){
+                case 0:
+                    str = "";
+                    break;
+                case 1:
+                    str = " ORDER BY word ASC";
+                    break;
+                case 2:
+                    str = " ORDER BY word DESC";
+                    break;
+            }
+
+            Cursor c = bookDB.rawQuery("SELECT * FROM "+bk_name+str, null);
 
             count = findViewById(R.id.wl_count);
             count.setText(c.getCount()+"개");
@@ -377,7 +440,7 @@ public class WordActivity extends AppCompatActivity {
                     Log.d(TAG,"삭제한 단어:"+select_word);
                     try{
                         bookDB.execSQL("DELETE FROM "+bk_name+" WHERE word='"+select_word+"';"); // 단어 삭제
-                        updateListView();
+                        updateListView(sort_state);
                         Toast.makeText(getApplicationContext(),"삭제되었습니다.",Toast.LENGTH_SHORT).show();
                     } catch (Exception e){
                         Toast.makeText(getApplicationContext(),"문제가 발생하였습니다. 개발자에게 문의하세요.",Toast.LENGTH_LONG).show();
@@ -417,7 +480,7 @@ public class WordActivity extends AppCompatActivity {
                             bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=1 WHERE word='"+select_word+"';");
                             break;
                     }
-                    updateListView();
+                    updateListView(sort_state);
                 }
             });
 

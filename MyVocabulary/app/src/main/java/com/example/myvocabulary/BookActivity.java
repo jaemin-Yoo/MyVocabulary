@@ -151,13 +151,13 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 틀렸어요, 다음 단어, 우선순위 증가
+                String str = String.valueOf(game_word.getText());
+                bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=pri+1 WHERE word='"+str+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
                 if (count!=c_cnt){
                     nextWord(); // 다음 단어
                 } else{
                     ending(); // 끝
                 }
-                String str = String.valueOf(game_word.getText());
-                bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=pri+1 WHERE word='"+str+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
             }
         });
 
@@ -167,6 +167,8 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 맞췄어요, 다음 단어
+                String str = String.valueOf(game_word.getText());
+                bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=pri-1 WHERE word='"+str+"' AND pri>-3;"); // 맞출 시 우선순위 감소 (최소 -3)
                 if (count!=c_cnt){
                     nextWord();
                 } else{

@@ -50,7 +50,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:layout_marginTop="120dp">
+            android:layout_marginTop="120dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <ImageView
                 android:id="@+id/word_text"
@@ -86,8 +88,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:hint="단어"
-                android:singleLine="true"
-                android:maxLength="16"/>
+                android:singleLine="true"/>
 
             <EditText
                 android:id="@+id/edit_mean"
@@ -96,22 +97,36 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:hint="뜻"
-                android:singleLine="true"
-                android:maxLength="27"/>
+                android:singleLine="true"/>
 
             <View
                 android:layout_width="70dp"
                 android:layout_height="40dp"/>
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/word_list"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="17dp"
-            android:layout_marginRight="17dp"
-            android:layout_marginBottom="17dp"
-            android:layout_marginTop="200dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btn_sort"
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="17dp"
+                android:layout_marginTop="200dp"
+                android:background="#00FF0000"
+                android:scaleType="fitCenter"/>
+
+            <ListView
+                android:id="@+id/word_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:layout_marginRight="17dp"
+                android:layout_marginBottom="17dp"/>
+
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/add_many"
