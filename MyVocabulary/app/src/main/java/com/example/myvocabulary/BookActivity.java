@@ -95,6 +95,7 @@ public class BookActivity extends AppCompatActivity {
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
         bookDB.execSQL("CREATE TABLE IF NOT EXISTS "+tablename
                 +" (name VARCHAR(10) PRIMARY KEY, subname VARCHAR(20));");
+        // 단어장 관리 테이블 생성
 
         back=findViewById(R.id.btn_back);
         Glide.with(this).load("https://i.imgur.com/iYM8Gc1.png").into(back); // 이미지 로드
@@ -155,15 +156,19 @@ public class BookActivity extends AppCompatActivity {
                             // Text 값 받아서 로그 남기기
                             add_name = et_name.getText().toString();
                             add_subname = et_subname.getText().toString();
+
+                            add_name = add_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                            add_subname = add_subname.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+
                             if (add_name.length() != 0 && add_subname.length() != 0){
                                 try{
-                                    bookDB.execSQL("CREATE TABLE "+add_name
-                                            +" (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20), pri INT DEFAULT 0);");
+                                    bookDB.execSQL("CREATE TABLE '"+add_name
+                                            +"' (word VARCHAR(10) PRIMARY KEY, mean VARCHAR(20), pri INT DEFAULT 0);");
                                     bookDB.execSQL("INSERT INTO "+tablename+" VALUES('"+add_name+"','"+add_subname+"');");
                                     updateListView();
                                     dialog.dismiss();     //닫기
                                 } catch (Exception e){
-                                    Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재합니다.",Toast.LENGTH_LONG).show();
                                 }
                             }
                             else{
@@ -240,7 +245,10 @@ public class BookActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 틀렸어요, 다음 단어, 우선순위 증가
                 String str = String.valueOf(game_word.getText());
-                bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=pri+1 WHERE word='"+str+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
+                str = str.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=pri+1 WHERE word='"+str+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
+                bk_name = bk_name.replace("''","'"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
                 if (count!=c_cnt){
                     nextWord(); // 다음 단어
                 } else{
@@ -256,7 +264,10 @@ public class BookActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 맞췄어요, 다음 단어
                 String str = String.valueOf(game_word.getText());
-                bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=pri-1 WHERE word='"+str+"' AND pri>-3;"); // 맞출 시 우선순위 감소 (최소 -3)
+                str = str.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=pri-1 WHERE word='"+str+"' AND pri>-3;"); // 맞출 시 우선순위 감소 (최소 -3)
+                bk_name = bk_name.replace("''","'"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
                 if (count!=c_cnt){
                     nextWord();
                 } else{
@@ -292,13 +303,15 @@ public class BookActivity extends AppCompatActivity {
                                 str="";
                                 break;
                             case 1:
-                                str=" ORDER BY pri DESC LIMIT 50";
+                                str=" ORDER BY pri DESC LIMIT 30";
                                 break;
                             case 2:
                                 str=" WHERE pri=-3";
                                 break;
                         }
-                        Cursor cursor = bookDB.rawQuery("SELECT * FROM "+bk_name+str, null);
+                        bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                        Cursor cursor = bookDB.rawQuery("SELECT * FROM '"+bk_name+"'"+str, null);
+                        bk_name = bk_name.replace("''","'"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
                         c_cnt = cursor.getCount();
 
                         if (c_cnt != 0){
@@ -463,14 +476,25 @@ public class BookActivity extends AppCompatActivity {
                         modify_name = et_name.getText().toString();
                         modify_subname = et_subname.getText().toString();
 
+                        modify_name = modify_name.replace("'","''");
+                        modify_subname = modify_subname.replace("'","''");
+                        select_name = select_name.replace("'","''");
+                        select_subname = select_subname.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+
                         try{
-                            bookDB.execSQL("ALTER TABLE "+select_name+" RENAME TO "+modify_name+";");
+                            if (!select_name.equals(modify_name)){ // 문자열 비교는 equals 사용
+                                Log.d(TAG,"select_name:"+select_name.getClass().getName());
+                                Log.d(TAG,"modify_name:"+modify_name.getClass().getName());
+                                Log.d(TAG,"T1");
+                                bookDB.execSQL("ALTER TABLE '"+select_name+"' RENAME TO '"+modify_name+"';");
+                            }
                             bookDB.execSQL("UPDATE "+tablename+" SET"+" name='"+modify_name+"', subname='"+modify_subname+"' WHERE name='"+select_name+"';");
+
                             updateListView();
                             dialog.dismiss();     //닫기
                             Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
                         } catch(Exception e){
-                            Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재하거나 특수문자가 포함되어있습니다.",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"에러:동일한 단어장이 존재합니다.",Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -509,9 +533,10 @@ public class BookActivity extends AppCompatActivity {
                 dl.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        select_name = select_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
                         try{
-                            bookDB.execSQL("DELETE FROM "+tablename+" WHERE name='"+select_name+"';"); // book Table에 해당 Data 삭제
-                            bookDB.execSQL("DROP TABLE "+select_name+";"); // 해당 Table 삭제
+                            bookDB.execSQL("DELETE FROM '"+tablename+"' WHERE name='"+select_name+"';"); // book Table에 해당 Data 삭제
+                            bookDB.execSQL("DROP TABLE '"+select_name+"';"); // 해당 Table 삭제
                             updateListView();
                             dialog.dismiss();     //닫기
                             Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();

@@ -80,7 +80,7 @@ public class WordActivity extends AppCompatActivity {
 
         title = findViewById(R.id.title);
         title.setText(bk_name); // 단어장 이름
-
+        bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
         bookDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
 
         back=findViewById(R.id.btn_back);
@@ -136,9 +136,12 @@ public class WordActivity extends AppCompatActivity {
                 add_word = et_word.getText().toString();
                 add_mean = et_mean.getText().toString();
 
+                add_word = add_word.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                add_mean = add_mean.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+
                 if(add_word.length() != 0 && add_mean.length() != 0){
                     try{
-                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
+                        bookDB.execSQL("INSERT INTO '"+bk_name+"' VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
                         updateListView(sort_state);
                         Log.d(TAG, "추가한 단어:"+add_word);
                     } catch (Exception e){
@@ -184,9 +187,16 @@ public class WordActivity extends AppCompatActivity {
                     case 1:
                         Glide.with(getApplicationContext()).load("https://i.imgur.com/LGwcFGr.png").into(sort); // z 정렬
                         sort_state = 2;
-
                         break;
                     case 2:
+                        Glide.with(getApplicationContext()).load("https://i.imgur.com/sMIpdik.png").into(sort); // 기본 정렬
+                        sort_state = 3;
+                        break;
+                    case 3:
+                        Glide.with(getApplicationContext()).load("https://i.imgur.com/WIITFyk.png").into(sort); // 기본 정렬
+                        sort_state = 4;
+                        break;
+                    case 4:
                         Glide.with(getApplicationContext()).load("https://i.imgur.com/xVbYlTz.png").into(sort); // 기본 정렬
                         sort_state = 0;
                         break;
@@ -235,9 +245,12 @@ public class WordActivity extends AppCompatActivity {
                                 add_word = slush[0];
                                 add_mean = slush[1];
 
+                                add_word = add_word.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                                add_mean = add_mean.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+
                                 if(add_word.length() != 0 && add_mean.length() != 0){
                                     try{
-                                        bookDB.execSQL("INSERT INTO "+bk_name+" VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
+                                        bookDB.execSQL("INSERT INTO '"+bk_name+"' VALUES('"+add_word+"','"+add_mean+"',0);"); // SQLite 단어 추가
                                         state++;
                                     } catch (Exception e){
                                         Toast.makeText(getApplicationContext(),"중복된 단어가 존재합니다.",Toast.LENGTH_LONG).show();
@@ -310,8 +323,12 @@ public class WordActivity extends AppCompatActivity {
                 modify_name = et_name.getText().toString();
                 modify_subname = et_subname.getText().toString();
 
+                modify_name = modify_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                modify_subname = modify_subname.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                select_name = select_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+
                 try{
-                    bookDB.execSQL("UPDATE "+bk_name+" SET"+" word='"+modify_name+"', mean='"+modify_subname+"' WHERE word='"+select_name+"';");
+                    bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" word='"+modify_name+"', mean='"+modify_subname+"' WHERE word='"+select_name+"';");
                     updateListView(sort_state);
                     dialog.dismiss();     //닫기
                     Toast.makeText(getApplicationContext(), "수정되었습니다.", Toast.LENGTH_LONG).show();
@@ -350,10 +367,14 @@ public class WordActivity extends AppCompatActivity {
                 case 2:
                     str = " ORDER BY word DESC";
                     break;
+                case 3:
+                    str = " ORDER BY pri DESC";
+                    break;
+                case 4:
+                    str = " ORDER BY pri ASC";
+                    break;
             }
-
-            Cursor c = bookDB.rawQuery("SELECT * FROM "+bk_name+str, null);
-
+            Cursor c = bookDB.rawQuery("SELECT * FROM '"+bk_name+"'"+str, null);
             count = findViewById(R.id.wl_count);
             count.setText(c.getCount()+"개");
 
@@ -365,6 +386,18 @@ public class WordActivity extends AppCompatActivity {
                         int Priority = c.getInt(c.getColumnIndex("pri"));
                         String pri_url = new String();
                         switch (Priority){
+                            case -3:
+                                pri_url = "https://i.imgur.com/rnUgMMM.png";
+                                break;
+                            case -2:
+                                pri_url = "https://i.imgur.com/SAXNNJi.png";
+                                break;
+                            case -1:
+                                pri_url = "https://i.imgur.com/LvYiluk.png";
+                                break;
+                            case 0:
+                                pri_url = "https://i.imgur.com/5sZaSCh.png";
+                                break;
                             case 1:
                                 pri_url = "https://i.imgur.com/NubkZ4l.png";
                                 break;
@@ -373,9 +406,6 @@ public class WordActivity extends AppCompatActivity {
                                 break;
                             case 3:
                                 pri_url = "https://i.imgur.com/KzZMZ7n.png";
-                                break;
-                            default: // 우선순위 0 또는 음수
-                                pri_url = "https://i.imgur.com/5sZaSCh.png";
                                 break;
                         }
                         adapter.addItem(new Wordlist(Name, Subname, "https://i.imgur.com/R4p7yBK.png",pri_url));
@@ -430,7 +460,7 @@ public class WordActivity extends AppCompatActivity {
             wordlistView.setImageView(item.getUrl());
             wordlistView.setImageView2(item.getUrl2());
 
-            final String select_word = item.getName();
+            final String select_word = item.getName().replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
 
             delete = wordlistView.findViewById(R.id.btn_delete);
             delete.setFocusable(false); // 리스트뷰와 리스트뷰 내 아이템 둘 다 클릭 가능하도록 설정
@@ -439,7 +469,7 @@ public class WordActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Log.d(TAG,"삭제한 단어:"+select_word);
                     try{
-                        bookDB.execSQL("DELETE FROM "+bk_name+" WHERE word='"+select_word+"';"); // 단어 삭제
+                        bookDB.execSQL("DELETE FROM '"+bk_name+"' WHERE word='"+select_word+"';"); // 단어 삭제
                         updateListView(sort_state);
                         Toast.makeText(getApplicationContext(),"삭제되었습니다.",Toast.LENGTH_SHORT).show();
                     } catch (Exception e){
@@ -454,7 +484,7 @@ public class WordActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     // 우선순위 클릭 시
-                    Cursor c = bookDB.rawQuery("SELECT pri FROM "+bk_name+" WHERE word='"+select_word+"';", null);
+                    Cursor c = bookDB.rawQuery("SELECT pri FROM '"+bk_name+"' WHERE word='"+select_word+"';", null);
                     int pri_cnt = 0;
                     if(c.moveToFirst()){
                         do{
@@ -465,19 +495,19 @@ public class WordActivity extends AppCompatActivity {
                     switch (pri_cnt){
                         case 1:
                             Glide.with(getApplicationContext()).load("https://i.imgur.com/RjwsANg.png").into(priority);
-                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=2 WHERE word='"+select_word+"';");
+                            bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=2 WHERE word='"+select_word+"';");
                             break;
                         case 2:
                             Glide.with(getApplicationContext()).load("https://i.imgur.com/KzZMZ7n.png").into(priority);
-                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=3 WHERE word='"+select_word+"';");
+                            bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=3 WHERE word='"+select_word+"';");
                             break;
                         case 3:
                             Glide.with(getApplicationContext()).load("https://i.imgur.com/5sZaSCh.png").into(priority);
-                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=0 WHERE word='"+select_word+"';");
+                            bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=0 WHERE word='"+select_word+"';");
                             break;
                         default: // 우선순위 0 또는 음수
                             Glide.with(getApplicationContext()).load("https://i.imgur.com/NubkZ4l.png").into(priority);
-                            bookDB.execSQL("UPDATE "+bk_name+" SET"+" pri=1 WHERE word='"+select_word+"';");
+                            bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=1 WHERE word='"+select_word+"';");
                             break;
                     }
                     updateListView(sort_state);

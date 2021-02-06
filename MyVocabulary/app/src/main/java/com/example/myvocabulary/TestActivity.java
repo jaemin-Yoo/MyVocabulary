@@ -75,11 +75,11 @@ public class TestActivity extends AppCompatActivity {
         });
 
         pri=findViewById(R.id.priority_test);
-        Glide.with(this).load("https://i.imgur.com/176BLtv.png").into(pri);
+        Glide.with(this).load("https://i.imgur.com/YUykJAi.png").into(pri);
         pri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 우선순위 50개 테스트
+                // 하루 테스트
                 test_state = 1;
                 Intent intent = new Intent(TestActivity.this, BookActivity.class);
                 startActivity(intent);
