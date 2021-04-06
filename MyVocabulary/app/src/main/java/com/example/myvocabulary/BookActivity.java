@@ -58,6 +58,7 @@ public class BookActivity extends AppCompatActivity {
     private String modify_subname;
     private String select_name;
     private String select_subname;
+    private String select_word;
     private String[] wd_arr;
     private String[] mn_arr;
     private int[] rd_arr;
@@ -244,15 +245,17 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 틀렸어요, 다음 단어, 우선순위 증가
-                String str = String.valueOf(game_word.getText());
-                str = str.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                select_word = String.valueOf(game_word.getText());
+
+                select_word = select_word.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
                 bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
-                bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=pri+1 WHERE word='"+str+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
-                bk_name = bk_name.replace("''","'"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=pri+1 WHERE word='"+select_word+"' AND pri<3;"); // 틀릴 시 우선순위 증가 (최대 3)
+                bk_name = bk_name.replace("''","'"); // 기존 문자열로 돌려두기
+
                 if (count!=c_cnt){
-                    nextWord(); // 다음 단어
+                    nextWord();
                 } else{
-                    ending(); // 끝
+                    ending();
                 }
             }
         });
@@ -263,15 +266,80 @@ public class BookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 맞췄어요, 다음 단어
-                String str = String.valueOf(game_word.getText());
-                str = str.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                select_word = String.valueOf(game_word.getText());
+
+                select_word = select_word.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
                 bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
-                bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=pri-1 WHERE word='"+str+"' AND pri>-3;"); // 맞출 시 우선순위 감소 (최소 -3)
-                bk_name = bk_name.replace("''","'"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
-                if (count!=c_cnt){
-                    nextWord();
-                } else{
-                    ending();
+                bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=pri-1 WHERE word='"+select_word+"' AND pri>-3;"); // 맞출 시 우선순위 감소 (최소 -3)
+                bk_name = bk_name.replace("''","'"); // 기존 문자열로 돌려두기
+
+                // 다 외운 단어 삭제
+                if (test_state == 2){
+                    LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    LinearLayout dialog = (LinearLayout) inflater.inflate(R.layout.dialog_box, null);
+
+                    ImageView dialog_icon = dialog.findViewById(R.id.dialog_icon);
+                    TextView dialog_title = dialog.findViewById(R.id.dialog_title);
+                    TextView dialog_subtitle = dialog.findViewById(R.id.dialog_subtitle);
+
+                    AlertDialog.Builder dl = new AlertDialog.Builder(BookActivity.this);
+
+                    Glide.with(getApplicationContext()).load("https://i.imgur.com/1tJF5TG.png").into(dialog_icon);
+                    dialog_title.setText("단어 삭제");
+                    dialog_subtitle.setText("단어를 외우셨습니다.\n정말 삭제하시겠습니까?");
+
+                    dl.setView(dialog);
+
+                    // 확인 버튼 설정
+                    dl.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try{
+                                bk_name = bk_name.replace("'","''"); // 특수문자 ' 사용 가능하도록 설정 (SQlite > ' 사용시 '' 입력)
+                                bookDB.execSQL("DELETE FROM '"+bk_name+"' WHERE word='"+select_word+"';"); // book Table에 해당 Data 삭제
+                                bk_name = bk_name.replace("''","'"); // 기존 문자열로 돌려두기
+                                updateListView();
+                                dialog.dismiss();     //닫기
+                                Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_LONG).show();
+                                if (count!=c_cnt){
+                                    nextWord(); // 다음 단어
+                                } else{
+                                    Toast.makeText(getApplicationContext(),"삭제 테스트를 완료하였습니다.",Toast.LENGTH_LONG).show();
+                                    game_layout.setVisibility(View.INVISIBLE);
+                                    disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+                                    count = 0;
+                                }
+                            } catch (Exception e){
+                                Toast.makeText(getApplicationContext(), "문제가 발생하였습니다. 개발자에게 문의하세요.",Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+                    // 취소 버튼 설정
+                    dl.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();     //닫기
+                            if (count!=c_cnt){
+                                nextWord(); // 다음 단어
+                            } else{
+                                Toast.makeText(getApplicationContext(),"삭제 테스트를 완료하였습니다.",Toast.LENGTH_LONG).show();
+                                game_layout.setVisibility(View.INVISIBLE);
+                                disableEnableControls(true, (ViewGroup)findViewById(R.id.book_layout));
+                                count = 0;
+                            }
+                        }
+                    });
+
+                    dl.show();
+                }
+
+                else{
+                    if (count!=c_cnt){
+                        nextWord(); // 다음 단어
+                    } else{
+                        ending(); // 끝
+                    }
                 }
             }
         });
@@ -389,7 +457,7 @@ public class BookActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();     //닫기
                 count = 0;
-                randomNumber();
+                randomNumber(); // 단어를 랜덤으로 배열
                 nextWord();
             }
         });

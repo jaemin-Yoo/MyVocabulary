@@ -54,6 +54,7 @@ public class WordActivity extends AppCompatActivity {
     private Wordlist wl;
     private String select_name, select_subname, modify_name, modify_subname;
     private int sort_state = 0;
+    private WordAdapter adapter;
 
     private MyAsyncTask myAsyncTask = new MyAsyncTask();
     SQLiteDatabase bookDB = null;
@@ -352,7 +353,7 @@ public class WordActivity extends AppCompatActivity {
     }
 
     public void updateListView(int sort_state){
-        WordAdapter adapter = new WordAdapter();
+        adapter = new WordAdapter();
 
         String str="";
 
@@ -454,7 +455,7 @@ public class WordActivity extends AppCompatActivity {
                 wordlistView = (WordlistView) view;
             }
 
-            Wordlist item = items.get(i);
+            final Wordlist item = items.get(i);
             wordlistView.setName(item.getName());
             wordlistView.setSubname(item.getSubname());
             wordlistView.setImageView(item.getUrl());
@@ -494,19 +495,15 @@ public class WordActivity extends AppCompatActivity {
 
                     switch (pri_cnt){
                         case 1:
-                            Glide.with(getApplicationContext()).load("https://i.imgur.com/RjwsANg.png").into(priority);
                             bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=2 WHERE word='"+select_word+"';");
                             break;
                         case 2:
-                            Glide.with(getApplicationContext()).load("https://i.imgur.com/KzZMZ7n.png").into(priority);
                             bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=3 WHERE word='"+select_word+"';");
                             break;
                         case 3:
-                            Glide.with(getApplicationContext()).load("https://i.imgur.com/5sZaSCh.png").into(priority);
                             bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=0 WHERE word='"+select_word+"';");
                             break;
                         default: // 우선순위 0 또는 음수
-                            Glide.with(getApplicationContext()).load("https://i.imgur.com/NubkZ4l.png").into(priority);
                             bookDB.execSQL("UPDATE '"+bk_name+"' SET"+" pri=1 WHERE word='"+select_word+"';");
                             break;
                     }

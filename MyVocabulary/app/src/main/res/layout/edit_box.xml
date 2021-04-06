@@ -68,7 +68,6 @@
             android:paddingLeft="5dp"
             android:hint="Name"
             android:singleLine="true"
-            android:maxLength="16"
             android:background="@drawable/stroke"/>
 
     </LinearLayout>
@@ -94,7 +93,6 @@
             android:gravity="top"
             android:hint="SubName"
             android:singleLine="true"
-            android:maxLength="27"
             android:background="@drawable/stroke"/>
 
     </LinearLayout>
