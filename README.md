@@ -3,8 +3,8 @@
 * 개인 프로젝트
 * 2020.09 ~
 
-## 1. Overview
+## 0. Overview
 
-## 2. Function
+## 1. Function
 
-## 3. UI
+## 2. UI
