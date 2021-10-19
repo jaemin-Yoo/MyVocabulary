@@ -17,7 +17,10 @@
 * 우선단어 하루 테스트 기능
 * 다 외운 단어 삭제 테스트 기능
 * 단어 우선순위 기능
+  - `틀렸어요` 클릭 시 우선순위 증가
+  - `맞췄어요` 클릭 시 우선순위 감소
 * 랜덤 테스트 기능
 
 ## 2. UI
 
+<img src="doc/imgs/img (1).png" width="30%"> <img src="doc/imgs/img (2).png" width="30%"> <img src="doc/imgs/img (3).png" width="30%"> <img src="doc/imgs/img (4).png" width="30%"> <img src="doc/imgs/img (5).png" width="30%"> <img src="doc/imgs/img (6).png" width="30%"> <img src="doc/imgs/img (7).png" width="30%"> <img src="doc/imgs/img (8).png" width="30%"> <img src="doc/imgs/img (9).png" width="30%">
